@@ -4,7 +4,7 @@ Application Name: MOOd
 
 Application Logo: 
 
-Description: MOOd is an internal application that allows you to track your daily mood, give you AI-powered suggestions to support you, and make a cute little account :3.
+Description: MOOd is an internal application with the cutest little cow friend that lets you input your daily mood, give you AI-powered suggestions to support you, and manage a simple user account :3.
 
 Application scope: Internal
 
