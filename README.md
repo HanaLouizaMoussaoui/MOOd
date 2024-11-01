@@ -49,7 +49,7 @@ erDiagram
 
    MoodHistory {
 	int history_id PK
-	date logged
+	date date_logged
 	int user_id FK
 	int mood_id FK
 }
