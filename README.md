@@ -23,3 +23,33 @@ Four screens:
 Parameters to be saved: Light or dark theme
 
 AI Integration: AI will be used to write custom messages to the user depending on their mood. 
+
+## Database Schema
+```mermaid
+erDiagram
+        User ||--o{ MoodHistory: has
+    Mood ||--|{ MoodHistory: has
+
+    User {
+        int user_ID PK
+        string name
+        string email
+        string password
+        date created_at
+        date edited_at
+        string profile_picture
+	string theme
+    }
+    Mood {
+	int mood_id PK
+	string name
+	string description
+    }
+
+   MoodHistory {
+	int history_id PK
+	date logged
+	int user_id FK
+	int mood_id FK
+}
+```
