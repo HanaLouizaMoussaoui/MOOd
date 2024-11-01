@@ -28,7 +28,8 @@ AI Integration: AI will be used to write custom messages to the user depending o
 ```mermaid
 erDiagram
         User ||--o{ MoodHistory: has
-    Mood ||--o{ MoodHistory: has
+    UserMood ||--|| MoodHistory: has
+   UserMood }o--|| MoodType: has
 
     User {
         int user_ID PK
@@ -40,10 +41,10 @@ erDiagram
         string profile_picture
 	string theme
     }
-    Mood {
+    UserMood {
 	int mood_id PK
-	string name
-	string description
+	string entry
+	int type_id FK
     }
 
    MoodHistory {
@@ -51,5 +52,10 @@ erDiagram
 	date logged
 	int user_id FK
 	int mood_id FK
+}
+   MoodType {
+	int type_id PK
+	string name
+	string description
 }
 ```
