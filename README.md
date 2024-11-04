@@ -35,13 +35,15 @@ MOOd is a kotlin application with the cutest little cow friend that lets you inp
 
 #### Four screens: 
 
-- Sign in page: Allows the user to login or create a new account.
-- Homepage: Displays a personalized message to the user encouraging them to log their mood for the day if they haven’t already, or gives them AI-Powered suggestions based on the mood they logged. 
-	- Mood Logging Page: Allows the user to log their mood for the day and shows a calendar view of the moods of the past month. 
-	- My Account Page: Allows the user to view their username and password and change it if necessary. 
-- Navigation: Buttons allow the user to navigate between the views.
-- Local Database: One “User” table with ID, username and password, preferred theme. One “Mood” table with mood logged, user ID and date logged.
 ![layout](./images/app_layout.png)
+- Sign in page: Allows the user to login or create a new account.
+- Home page: View personalized AI messages from our application mascot.
+- Mood Logging Dashboard: Allows the user to log their mood for the day and shows a view of the moods entered.
+- My Account Page: Allows the user to view their username, email, and password and change it if necessary. 
+	- (+ Navigation: Buttons allow the user to navigate between the views.)
+  
+#### Local Database: 
+One “User” table with ID, username and password, preferred theme. One “Mood” table with mood logged, user ID and date logged.
 
 
 #### Parameters to be saved: 
