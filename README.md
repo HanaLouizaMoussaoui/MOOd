@@ -3,6 +3,7 @@
 #### Application Name: MOOd
 
 #### Application Logo: 
+![logo](./images/Image.jpg)
 
 #### Description: 
 MOOd is a kotlin application with the cutest little cow friend that lets you input your daily mood, give you AI-powered suggestions to support you, and manage a simple user account. The app has multiple themes the user can pick from, and provides a comforting safe space for users to journal their feelings.
@@ -40,6 +41,8 @@ MOOd is a kotlin application with the cutest little cow friend that lets you inp
 	- My Account Page: Allows the user to view their username and password and change it if necessary. 
 - Navigation: Buttons allow the user to navigate between the views.
 - Local Database: One “User” table with ID, username and password, preferred theme. One “Mood” table with mood logged, user ID and date logged.
+![layout](./images/app_layout.png)
+
 
 #### Parameters to be saved: 
 
