@@ -1,10 +1,13 @@
 package com.example.mood.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.time.LocalDate
 
+@Entity
 data class MoodHistory(
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)val id: Int = 0,
     val userId: Int,
-    val mood: Mood,
+    val mood: MoodType,
     val dateLogged: LocalDate
 )
