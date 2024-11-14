@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
             Box(modifier = Modifier.fillMaxSize()) {
                 Button(
                     onClick = {
-                        user = getUserById(1)
+                        user = getUserById(2)
                     }, modifier = Modifier
                         .padding(16.dp)
                         .align(Alignment.BottomCenter)
@@ -120,14 +120,6 @@ fun MoodCalendar(monthLogs: List<MoodHistory>, user: User?) {
             MoodDayItem(date, moodForDay)
         }
     }
-    Spacer(modifier = Modifier.height(16.dp))
-    if (user != null) {
-        Text(text = user.name)
-    }
-    else {
-        Text(text = "No worky")
-    }
-
 }
 
 @SuppressLint("NewApi")
