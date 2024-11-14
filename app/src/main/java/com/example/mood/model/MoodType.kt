@@ -1,5 +1,8 @@
 package com.example.mood.model
 
-enum class Mood {
+import androidx.room.Entity
+
+@Entity
+enum class MoodType {
     HAPPY, SAD, NEUTRAL, ANGRY, ANXIOUS
 }
