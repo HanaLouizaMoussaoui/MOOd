@@ -19,14 +19,16 @@ class MoodViewModel() : ViewModel() {
     val uiState: StateFlow<UiState> =
         _uiState.asStateFlow()
 
+    private val _results = MutableStateFlow<List<ResultItem>>(emptyList())
+    val results: StateFlow<List<ResultItem>> = _results.asStateFlow()
+
     private val generativeModel = GenerativeModel(
         modelName = "gemini-1.5-flash",
         apiKey = "AIzaSyBWs3W5AfZTHoo57RcG0kJXNHqOFrFuxdM"
     )
 
-    fun sendPrompt(
-        prompt: String
-    ) {
+    fun sendPrompt(prompt: String) {
+        _results.value += ResultItem(prompt = prompt, isLoading = true)
         _uiState.value = UiState.Loading
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -38,10 +40,34 @@ class MoodViewModel() : ViewModel() {
                 )
                 response.text?.let { outputContent ->
                     _uiState.value = UiState.Success(outputContent)
+
+                    val updatedResults = _results.value.map {
+                        if (it.prompt == prompt) it.copy(isLoading = false, result = outputContent)
+                        else it
+                    }
+                    _results.value = updatedResults
+                } ?: run {
+                    val updatedResults = _results.value.map {
+                        if (it.prompt == prompt) it.copy(isLoading = false, result = "The AI response was empty.")
+                        else it
+                    }
+                    _results.value = updatedResults
                 }
+
             } catch (e: Exception) {
+                val updatedResults = _results.value.map {
+                    if (it.prompt == prompt) it.copy(isLoading = false, result = "Error: ${e.localizedMessage ?: "Unknown error"}")
+                    else it
+                }
+                _results.value = updatedResults
                 _uiState.value = UiState.Error(e.localizedMessage ?: "")
             }
         }
     }
+
+    data class ResultItem(
+        val prompt: String,
+        val result: String? = null,
+        val isLoading: Boolean = false
+    )
 }
