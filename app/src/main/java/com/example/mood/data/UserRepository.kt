@@ -6,7 +6,7 @@ import com.example.mood.objects.UserDao
 import kotlinx.coroutines.flow.first
 import java.time.LocalDateTime
 
-class MoodRepository(private val userDao: UserDao) {
+class UserRepository(private val userDao: UserDao) {
     suspend fun addUser(name: String,
                         email: String,
                         password: String,

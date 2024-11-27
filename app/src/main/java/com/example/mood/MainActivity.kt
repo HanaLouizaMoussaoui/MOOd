@@ -26,7 +26,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -39,14 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.mood.data.DatabaseProvider
-import com.example.mood.data.MoodRepository
+import com.example.mood.data.UserRepository
 import java.time.LocalDate
 import java.time.YearMonth
 import com.example.mood.model.MoodType
@@ -60,9 +57,9 @@ import java.time.LocalDateTime.now
 
 
 class MainActivity : ComponentActivity() {
-    private val moodRepository: MoodRepository by lazy {
+    private val userRepository: UserRepository by lazy {
         val database = DatabaseProvider.AppDatabase.getDatabase(this)
-        MoodRepository(database.userDao())
+        UserRepository(database.userDao())
     }
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +77,7 @@ class MainActivity : ComponentActivity() {
             Box(modifier = Modifier.fillMaxSize()) {
                 Button(
                     onClick = {
-                        user = getUserById(2)
+                        addUser()
                     }, modifier = Modifier
                         .padding(16.dp)
                         .align(Alignment.BottomCenter)
@@ -108,8 +105,8 @@ class MainActivity : ComponentActivity() {
 
         fun addUser() {
             lifecycleScope.launch {
-                moodRepository.addUser(
-                    name = "Ryan", password = "password", email = "email@email.com",
+                userRepository.addUser(
+                    name = "gabriel", password = "even_worse_password", email = "email@email.com",
                     createdAt = now(), editedAt = now(), profilePicture = null, mood = null
                 )
             }
@@ -118,7 +115,7 @@ class MainActivity : ComponentActivity() {
     private fun getUserById(id: Int) : User? {
         var user: User? = null
         lifecycleScope.launch {
-           user = moodRepository.getUserById(id)
+           user = userRepository.getUserById(id)
         }
         return user
     }
