@@ -1,6 +1,5 @@
-package com.example.mood.data
+package com.example.mood.data.repositories
 
-import com.example.mood.model.MoodType
 import com.example.mood.model.User
 import com.example.mood.objects.UserDao
 import kotlinx.coroutines.flow.first
@@ -12,11 +11,10 @@ class UserRepository(private val userDao: UserDao) {
                         password: String,
                         createdAt: LocalDateTime,
                         editedAt: LocalDateTime,
-                        profilePicture: String?,
-                        mood: MoodType?) {
+                        profilePicture: String?) {
         userDao.insert(
             User(name = name, email = email, password = password, createdAt = createdAt,
-            editedAt = editedAt, profilePicture = profilePicture, mood = mood)
+            editedAt = editedAt, profilePicture = profilePicture)
         )
     }
 

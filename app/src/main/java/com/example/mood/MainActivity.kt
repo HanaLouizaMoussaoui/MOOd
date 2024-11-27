@@ -43,7 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.mood.data.DatabaseProvider
-import com.example.mood.data.UserRepository
+import com.example.mood.data.repositories.UserRepository
 import java.time.LocalDate
 import java.time.YearMonth
 import com.example.mood.model.MoodType

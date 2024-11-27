@@ -8,19 +8,17 @@ import androidx.room.TypeConverters
 import java.time.Instant
 import java.time.ZoneOffset
 
-@Entity
+@Entity(tableName = "user")
 @TypeConverters(LocalDateTimeConverter::class)
 data class User(
-    @PrimaryKey(autoGenerate = true)val id: Int = 0,
+    @PrimaryKey(autoGenerate = true)val id: Int = 1,
     val name: String,
     val email: String,
     val password: String,
     val createdAt: LocalDateTime,
     val editedAt: LocalDateTime,
     val profilePicture: String?,
-    val mood: MoodType?
 )
-
 
 class LocalDateTimeConverter {
     @TypeConverter

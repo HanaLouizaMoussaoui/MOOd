@@ -1,8 +1,10 @@
 package com.example.mood.model
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Entity
-enum class MoodType {
-    HAPPY, SAD, NEUTRAL, ANGRY, ANXIOUS
-}
+@Entity(tableName = "mood_type")
+data class MoodType(
+    @PrimaryKey(autoGenerate = true) val id: Int = 1,
+    val name: String
+)
