@@ -1,0 +1,28 @@
+package com.example.mood.objects
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.example.mood.model.MoodType
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface MoodTypeDao {
+    @Insert
+    suspend fun insert(moodType: MoodType)
+
+    @Update
+    suspend fun update(moodType: MoodType)
+
+    @Delete
+    suspend fun delete(moodType: MoodType)
+
+    @Query("SELECT * FROM mood_type")
+    suspend fun getAllMoodTypes(): List<MoodType>
+
+    @Query("SELECT * FROM mood_type WHERE id = :moodTypeId")
+    suspend fun getMoodTypeById(moodTypeId: Int): MoodType
+}

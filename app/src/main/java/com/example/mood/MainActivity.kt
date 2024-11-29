@@ -30,9 +30,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,14 +45,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.mood.data.DatabaseProvider
+import com.example.mood.data.repositories.MoodTypeRepository
 import com.example.mood.data.repositories.UserRepository
 import java.time.LocalDate
 import java.time.YearMonth
 import com.example.mood.model.MoodType
 import com.example.mood.model.MoodHistory
 import com.example.mood.model.User
+import com.example.mood.model.UserMood
+import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.UiState
 import com.example.mood.viewmodel.MoodViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime.now
 
@@ -61,17 +69,25 @@ class MainActivity : ComponentActivity() {
         val database = DatabaseProvider.AppDatabase.getDatabase(this)
         UserRepository(database.userDao())
     }
+    private val moodTypeRepository: MoodTypeRepository by lazy {
+        val database = DatabaseProvider.AppDatabase.getDatabase(this)
+        MoodTypeRepository(database.moodTypeDao())
+    }
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        seedDatabase(moodTypeRepository)
+
         setContent {
+            val moodTypes = getMoodTypes()
+
             val sampleMoodLogs = listOf(
-                MoodHistory(1, 1, MoodType.HAPPY, LocalDate.of(2024, 11, 1)),
-                MoodHistory(2, 1, MoodType.SAD, LocalDate.of(2024, 11, 2)),
-                MoodHistory(3, 1, MoodType.NEUTRAL, LocalDate.of(2024, 11, 3)),
-                MoodHistory(4, 1, MoodType.ANXIOUS, LocalDate.of(2024, 11, 4)),
-                MoodHistory(5, 1, MoodType.HAPPY, LocalDate.of(2024, 11, 5)),
-                MoodHistory(6, 1, MoodType.ANGRY, LocalDate.of(2024, 11, 6)),
+                MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.ordinal), LocalDate.of(2024, 11, 1)),
+                MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.ordinal), LocalDate.of(2024, 11, 2)),
+                MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.ordinal), LocalDate.of(2024, 11, 3)),
+                MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.ordinal), LocalDate.of(2024, 11, 4)),
+                MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.ordinal), LocalDate.of(2024, 11, 5)),
+                MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.ordinal), LocalDate.of(2024, 11, 6)),
             )
             var user: User? = null
             Box(modifier = Modifier.fillMaxSize()) {
@@ -85,12 +101,19 @@ class MainActivity : ComponentActivity() {
                     Text("Add User")
                 }
                 Column(){
-                    MoodCalendar(monthLogs = sampleMoodLogs, user = user)
+                    MoodCalendar(monthLogs = sampleMoodLogs, user = user, moodTypeRepository)
                     AIPromptBox()
                 }
             }
         }
     }
+        fun getMoodTypes() : List<MoodType> {
+            var moodTypes = listOf<MoodType>()
+            lifecycleScope.launch {
+                moodTypes = moodTypeRepository.getAllMoodTypes()
+            }
+            return moodTypes
+        }
 
         fun showPopup(context: Context, title: String, message: String) {
             val builder = AlertDialog.Builder(context)
@@ -105,9 +128,9 @@ class MainActivity : ComponentActivity() {
 
         fun addUser() {
             lifecycleScope.launch {
-                userRepository.addUser(
+                userRepository.insert(User(
                     name = "gabriel", password = "even_worse_password", email = "email@email.com",
-                    createdAt = now(), editedAt = now(), profilePicture = null, mood = null
+                    createdAt = now(), editedAt = now(), profilePicture = null)
                 )
             }
         }
@@ -118,6 +141,29 @@ class MainActivity : ComponentActivity() {
            user = userRepository.getUserById(id)
         }
         return user
+    }
+}
+
+fun seedDatabase(moodTypeRepository: MoodTypeRepository) {
+    CoroutineScope(Dispatchers.IO).launch {
+        val moods = moodTypeRepository.getAllMoodTypes()
+        if (moods.isEmpty()) {
+            val moodTypes = MoodTypeEnum.entries.map { MoodType(name = it.mood) }
+            moodTypes.forEach {
+                moodTypeRepository.insert(it)
+            }
+        }
+    }
+}
+
+fun remove(moodTypeRepository: MoodTypeRepository) {
+    CoroutineScope(Dispatchers.IO).launch {
+        val moodTypes = moodTypeRepository.getAllMoodTypes()
+        moodTypes.forEach {
+            if (it.id == 10){
+                moodTypeRepository.delete(it)
+            }
+        }
     }
 }
 
@@ -276,7 +322,7 @@ fun AIPromptBox(moodViewModel: MoodViewModel = MoodViewModel()){
 
 @SuppressLint("NewApi")
 @Composable
-fun MoodCalendar(monthLogs: List<MoodHistory>, user: User?) {
+fun MoodCalendar(monthLogs: List<MoodHistory>, user: User?, moodTypeRepository: MoodTypeRepository) {
     val currentMonth = YearMonth.now()
     val daysInMonth = currentMonth.lengthOfMonth()
     val datesInMonth = (1..daysInMonth).map { currentMonth.atDay(it) }
@@ -286,22 +332,32 @@ fun MoodCalendar(monthLogs: List<MoodHistory>, user: User?) {
         contentPadding = PaddingValues(8.dp)
     ) {
         items(datesInMonth) { date ->
-            val moodForDay = monthLogs.find { it.dateLogged == date }?.mood
-            MoodDayItem(date, moodForDay)
+            val moodForDay = monthLogs.find { it.dateLogged == date }
+            val moodType = remember { mutableStateOf<MoodType?>(null) }
+
+            LaunchedEffect(moodForDay) {
+                moodForDay?.let {
+                    moodType.value = moodTypeRepository.getMoodTypeById(it.userMoodId.typeId)
+                }
+            }
+
+            MoodDayItem(date, moodType.value)
         }
     }
 }
 
+
+
 @SuppressLint("NewApi")
 @Composable
 fun MoodDayItem(date: LocalDate, mood: MoodType?) {
-    val moodColor = when (mood) {
-        MoodType.HAPPY -> Color.Green
-        MoodType.SAD -> Color.Blue
-        MoodType.NEUTRAL -> Color.Gray
-        MoodType.ANGRY -> Color.Red
-        MoodType.ANXIOUS -> Color.Yellow
-        null -> Color.LightGray
+    val moodColor = when (mood?.name) {
+        MoodTypeEnum.HAPPY.mood -> Color.Green
+        MoodTypeEnum.SAD.mood -> Color.Blue
+        MoodTypeEnum.NEUTRAL.mood -> Color.Gray
+        MoodTypeEnum.ANGRY.mood -> Color.Red
+        MoodTypeEnum.ANXIOUS.mood -> Color.Yellow
+        else -> Color.White
     }
 
     Box(
@@ -322,16 +378,21 @@ fun MoodDayItem(date: LocalDate, mood: MoodType?) {
 @SuppressLint("NewApi")
 @Composable
 fun PreviewMoodCalendar() {
+    val moodTypes = MainActivity().getMoodTypes()
+
     val sampleMoodLogs = listOf(
-        MoodHistory(1, 1, MoodType.HAPPY, LocalDate.of(2024, 11, 1)),
-        MoodHistory(2, 1, MoodType.SAD, LocalDate.of(2024, 11, 2)),
-        MoodHistory(3, 1,MoodType.NEUTRAL, LocalDate.of(2024, 11, 3)),
-        MoodHistory(4,1,MoodType.ANXIOUS, LocalDate.of(2024, 11, 4)),
-        MoodHistory(5,1, MoodType.HAPPY, LocalDate.of(2024, 11, 5)),
-        MoodHistory(6,1, MoodType.ANGRY, LocalDate.of(2024, 11, 6)),
+        MoodHistory(1, 1, UserMood(entry = "very nice", typeId = moodTypes[0].id), LocalDate.of(2024, 11, 1)),
+        MoodHistory(2, 1, UserMood(entry = "very bad", typeId = moodTypes[1].id), LocalDate.of(2024, 11, 2)),
+        MoodHistory(3, 1, UserMood(entry = "neutral", typeId = moodTypes[2].id), LocalDate.of(2024, 11, 3)),
+        MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = moodTypes[3].id), LocalDate.of(2024, 11, 4)),
+        MoodHistory(5, 1, UserMood(entry = "very happy", typeId = moodTypes[0].id), LocalDate.of(2024, 11, 5)),
+        MoodHistory(6, 1, UserMood(entry = "very angry", typeId = moodTypes[4].id), LocalDate.of(2024, 11, 6)),
     )
-    MoodCalendar(monthLogs = sampleMoodLogs, null)
+    MoodCalendar(monthLogs = sampleMoodLogs, null, MoodTypeRepository(DatabaseProvider.AppDatabase.getDatabase(context = MainActivity()).moodTypeDao()))
 }
+
+
+
 
 @Preview(showBackground = true)
 @Composable
