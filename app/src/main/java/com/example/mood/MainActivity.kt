@@ -1,8 +1,6 @@
 package com.example.mood
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -43,8 +41,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.example.mood.data.DatabaseProvider
+import com.example.mood.data.MoodRepository
+import com.example.mood.ui.screens.HomeScreen
 import com.example.mood.data.repositories.MoodTypeRepository
 import com.example.mood.data.repositories.UserMoodRepository
 import com.example.mood.data.repositories.UserRepository
@@ -87,6 +86,9 @@ class MainActivity : ComponentActivity() {
         seedDatabase(moodTypeRepository)
 
         setContent {
+            HomeScreen(PaddingValues(8.dp))
+        }
+    }
             val moodTypes = getMoodTypes()
 
             val sampleMoodLogs = listOf(

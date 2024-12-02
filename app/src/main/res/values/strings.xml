@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">MOOd</string>
-    <string name="prompt_placeholder">Today I am feeling: </string>
-    <string name="results_placeholder">(Results will appear here)</string>
+    <string name="prompt_placeholder"><string name="prompt_placeholder">Today I am feeling: </string></string>
+    <string name="results_placeholder">Hi! I\'m Moo, your personal mood assistant.</string>
 </resources>

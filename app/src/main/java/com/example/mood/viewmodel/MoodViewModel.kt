@@ -1,7 +1,7 @@
 package com.example.mood.viewmodel
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
+import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
 import com.example.mood.ui.UiState
 import com.google.ai.client.generativeai.BuildConfig
@@ -30,7 +30,6 @@ class MoodViewModel() : ViewModel() {
     fun sendPrompt(prompt: String) {
         _results.value += ResultItem(prompt = prompt, isLoading = true)
         _uiState.value = UiState.Loading
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = generativeModel.generateContent(
@@ -64,10 +63,10 @@ class MoodViewModel() : ViewModel() {
             }
         }
     }
-
     data class ResultItem(
         val prompt: String,
         val result: String? = null,
         val isLoading: Boolean = false
     )
+
 }
