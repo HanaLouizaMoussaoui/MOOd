@@ -54,6 +54,7 @@ android {
 dependencies {
 
     implementation(libs.generativeai)
+    implementation(libs.androidx.navigation.compose)
     //Room
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation(libs.androidx.room.runtime)

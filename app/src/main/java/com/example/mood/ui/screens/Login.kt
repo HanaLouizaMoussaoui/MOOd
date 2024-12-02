@@ -27,13 +27,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.ui.theme.MOOdTheme
+import com.example.mood.viewmodel.MoodViewModel
 
 
 @Composable
-fun LoginScreen(contentPadding: PaddingValues) {
+fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
     MOOdTheme {
         Column(
             modifier = Modifier
@@ -52,7 +54,7 @@ fun LoginScreen(contentPadding: PaddingValues) {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(PaddingValues(8.dp))
+
 }
 
 @Composable

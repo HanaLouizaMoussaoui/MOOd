@@ -23,7 +23,8 @@ import com.example.mood.R
 
 @Composable
 fun NavBar(
-    onHomeClick: () -> Unit
+    onHomeClick: () -> Unit,
+    onLogClick: () -> Unit
 ) {
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.secondary,
@@ -52,7 +53,7 @@ fun NavBar(
         Column (
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            IconButton(onClick = onHomeClick,
+            IconButton(onClick = onLogClick,
                 modifier = Modifier.height(20.dp)) {
                  Icon(
                  painter = painterResource(id = R.drawable.bookmark),
