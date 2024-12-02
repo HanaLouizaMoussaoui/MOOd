@@ -5,15 +5,15 @@ import com.example.mood.objects.MoodTypeDao
 
 class MoodTypeRepository(private val moodTypeDao: MoodTypeDao) :MoodTypeDao {
     override suspend fun insert(moodType: MoodType) {
-        moodTypeDao.insert(moodType)
+        return moodTypeDao.insert(moodType)
     }
 
     override suspend fun update(moodType: MoodType) {
-        TODO("Not yet implemented")
+        return moodTypeDao.update(moodType)
     }
 
     override suspend fun delete(moodType: MoodType) {
-        moodTypeDao.delete(moodType)
+        return moodTypeDao.delete(moodType)
     }
 
     override suspend fun getAllMoodTypes(): List<MoodType> {

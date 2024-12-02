@@ -3,10 +3,13 @@ package com.example.mood.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
-import java.time.LocalDate
+import androidx.room.TypeConverters
+import com.example.mood.converters.LocalDateTimeConverter
+import java.time.LocalDateTime
+
 
 @Entity(
-    tableName = "mood_history",
+    tableName = "user_mood_history",
     foreignKeys = [ForeignKey(
         entity = User::class,
         parentColumns = ["id"],
@@ -20,9 +23,10 @@ import java.time.LocalDate
         onDelete = ForeignKey.CASCADE
     )]
 )
+@TypeConverters(LocalDateTimeConverter::class)
 data class MoodHistory(
     @PrimaryKey(autoGenerate = true)val id: Int = 0,
     val userId: Int,
-    val userMoodId: UserMood,
-    val dateLogged: LocalDate
+    val userMoodId: Int,
+    val dateLogged: LocalDateTime
 )

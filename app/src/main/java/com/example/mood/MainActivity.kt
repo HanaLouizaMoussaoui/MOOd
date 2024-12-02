@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.mood.data.DatabaseProvider
 import com.example.mood.data.repositories.MoodTypeRepository
+import com.example.mood.data.repositories.UserMoodRepository
 import com.example.mood.data.repositories.UserRepository
 import java.time.LocalDate
 import java.time.YearMonth
@@ -60,6 +61,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 
 
@@ -73,6 +75,11 @@ class MainActivity : ComponentActivity() {
         val database = DatabaseProvider.AppDatabase.getDatabase(this)
         MoodTypeRepository(database.moodTypeDao())
     }
+    private val userMoodRepository: UserMoodRepository by lazy {
+        val database = DatabaseProvider.AppDatabase.getDatabase(this)
+        UserMoodRepository(database.userMoodDao())
+    }
+
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,12 +90,12 @@ class MainActivity : ComponentActivity() {
             val moodTypes = getMoodTypes()
 
             val sampleMoodLogs = listOf(
-                MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id), LocalDate.of(2024, 12, 1)),
-                MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id), LocalDate.of(2024, 12, 2)),
-                MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id), LocalDate.of(2024, 12, 3)),
-                MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id), LocalDate.of(2024, 12, 4)),
-                MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id), LocalDate.of(2024, 12, 5)),
-                MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id), LocalDate.of(2024, 12, 6)),
+                MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 1, 0,0)),
+                MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).id, LocalDateTime.of(2024, 12, 2,0,0)),
+                MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).id, LocalDateTime.of(2024, 12, 3,0,0)),
+                MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).id, LocalDateTime.of(2024, 12, 4,0,0)),
+                MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 5,0,0)),
+                MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).id, LocalDateTime.of(2024, 12, 6,0,0)),
             )
             var user: User? = null
             Box(modifier = Modifier.fillMaxSize()) {
@@ -102,7 +109,7 @@ class MainActivity : ComponentActivity() {
                     Text("Add User")
                 }
                 Column(){
-                    MoodCalendar(monthLogs = sampleMoodLogs, user = user, moodTypeRepository)
+                    MoodCalendar(monthLogs = sampleMoodLogs, user = user, moodTypeRepository, userMoodRepository)
                     AIPromptBox()
                 }
             }
@@ -322,7 +329,7 @@ fun AIPromptBox(moodViewModel: MoodViewModel = MoodViewModel()){
 
 @SuppressLint("NewApi")
 @Composable
-fun MoodCalendar(monthLogs: List<MoodHistory>, user: User?, moodTypeRepository: MoodTypeRepository) {
+fun MoodCalendar(monthLogs: List<MoodHistory>, user: User?, moodTypeRepository: MoodTypeRepository, userMoodRepository: UserMoodRepository) {
     val currentMonth = YearMonth.now()
     val daysInMonth = currentMonth.lengthOfMonth()
     val datesInMonth = (1..daysInMonth).map { currentMonth.atDay(it) }
@@ -332,15 +339,18 @@ fun MoodCalendar(monthLogs: List<MoodHistory>, user: User?, moodTypeRepository: 
         contentPadding = PaddingValues(8.dp)
     ) {
         items(datesInMonth) { date ->
-            val moodForDay = monthLogs.find { it.dateLogged == date }
+            val moodForDay = monthLogs.find { it.dateLogged.toLocalDate() == date }
             val moodType = remember { mutableStateOf<MoodType?>(null) }
 
             LaunchedEffect(moodForDay) {
                 moodForDay?.let {
-                    moodType.value = moodTypeRepository.getMoodTypeByName(MoodTypeEnum.values().find { enum -> enum.id == it.userMoodId.typeId }?.mood ?: "")
+                    val userMood = userMoodRepository.getUserMoodById(it.userMoodId)
+                    val mood = MoodTypeEnum.entries.find { it.id == userMood.typeId }
+                    if (mood != null) {
+                        moodType.value = moodTypeRepository.getMoodTypeByName(mood.name)
+                    }
                 }
             }
-
             MoodDayItem(date, moodType.value)
         }
     }
@@ -381,14 +391,14 @@ fun PreviewMoodCalendar() {
     val moodTypes = MainActivity().getMoodTypes()
 
     val sampleMoodLogs = listOf(
-        MoodHistory(1, 1, UserMood(entry = "very nice", typeId = moodTypes[0].id), LocalDate.of(2024, 11, 1)),
-        MoodHistory(2, 1, UserMood(entry = "very bad", typeId = moodTypes[1].id), LocalDate.of(2024, 11, 2)),
-        MoodHistory(3, 1, UserMood(entry = "neutral", typeId = moodTypes[2].id), LocalDate.of(2024, 11, 3)),
-        MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = moodTypes[3].id), LocalDate.of(2024, 11, 4)),
-        MoodHistory(5, 1, UserMood(entry = "very happy", typeId = moodTypes[0].id), LocalDate.of(2024, 11, 5)),
-        MoodHistory(6, 1, UserMood(entry = "very angry", typeId = moodTypes[4].id), LocalDate.of(2024, 11, 6)),
+        MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 1, 0,0)),
+        MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).id, LocalDateTime.of(2024, 12, 2,0,0)),
+        MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).id, LocalDateTime.of(2024, 12, 3,0,0)),
+        MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).id, LocalDateTime.of(2024, 12, 4,0,0)),
+        MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 5,0,0)),
+        MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).id, LocalDateTime.of(2024, 12, 6,0,0)),
     )
-    MoodCalendar(monthLogs = sampleMoodLogs, null, MoodTypeRepository(DatabaseProvider.AppDatabase.getDatabase(context = MainActivity()).moodTypeDao()))
+    MoodCalendar(monthLogs = sampleMoodLogs, null, MoodTypeRepository(DatabaseProvider.AppDatabase.getDatabase(context = MainActivity()).moodTypeDao()), UserMoodRepository(DatabaseProvider.AppDatabase.getDatabase(context = MainActivity()).userMoodDao()))
 }
 
 

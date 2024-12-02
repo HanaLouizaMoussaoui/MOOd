@@ -7,6 +7,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import java.time.Instant
 import java.time.ZoneOffset
+import com.example.mood.converters.LocalDateTimeConverter
 
 @Entity(tableName = "user")
 @TypeConverters(LocalDateTimeConverter::class)
@@ -20,16 +21,3 @@ data class User(
     val profilePicture: String?,
 )
 
-class LocalDateTimeConverter {
-    @TypeConverter
-    fun fromTimestamp(value: Long?): LocalDateTime? {
-        return value?.let {
-            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneOffset.UTC)
-        }
-    }
-
-    @TypeConverter
-    fun toTimestamp(date: LocalDateTime?): Long? {
-        return date?.atZone(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
-    }
-}
