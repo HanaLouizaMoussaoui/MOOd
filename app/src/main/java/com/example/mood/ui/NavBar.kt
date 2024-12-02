@@ -23,7 +23,7 @@ fun NavBar(
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.secondary,
         contentColor = Color.Black,
-        modifier = Modifier.height(50.dp)
+        modifier = Modifier.height(70.dp)
     ) {
         Column {
             IconButton(onClick = onHomeClick,
@@ -48,7 +48,7 @@ fun NavBar(
                 // )
 
             }
-            Text("Log New Mood")
+            Text("Log a Mood")
         }
 
     }

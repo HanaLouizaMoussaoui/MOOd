@@ -1,6 +1,9 @@
 package com.example.mood.ui.screens
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.R
@@ -10,7 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,9 +39,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mood.model.MoodHistory
+import com.example.mood.model.MoodType
+import com.example.mood.model.User
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.ui.theme.MOOdTheme
+import java.time.LocalDate
+import java.time.YearMonth
 
 
 @Composable
@@ -144,6 +156,11 @@ fun MoodSelectionPage() {
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(top = 16.dp)
         )
+        MoodCalendar()
+
+
+
+
 
     }
 }
@@ -161,4 +178,60 @@ fun MoodButton(mood: String, isSelected: Boolean, onClick: () -> Unit) {
     ) {
         Text(text = mood, style = MaterialTheme.typography.bodySmall)
     }
+}
+
+
+@SuppressLint("NewApi")
+@Composable
+fun MoodCalendar() {
+    val sampleMoodLogs = listOf(
+        MoodHistory(1, 1, MoodType.HAPPY, LocalDate.of(2024, 12, 1)),
+        MoodHistory(2, 1, MoodType.SAD, LocalDate.of(2024, 12, 2)),
+        MoodHistory(3, 1, MoodType.NEUTRAL, LocalDate.of(2024, 12, 3)),
+        MoodHistory(4, 1, MoodType.ANXIOUS, LocalDate.of(2024, 12, 4)),
+        MoodHistory(5, 1, MoodType.HAPPY, LocalDate.of(2024, 12, 5)),
+        MoodHistory(6, 1, MoodType.ANGRY, LocalDate.of(2024, 12, 10)),
+    )
+    var user: User? = null
+
+    val currentMonth = YearMonth.now()
+    val daysInMonth = currentMonth.lengthOfMonth()
+    val datesInMonth = (1..daysInMonth).map { currentMonth.atDay(it) }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(7),
+        contentPadding = PaddingValues(8.dp)
+    ) {
+        items(datesInMonth) { date ->
+            val moodForDay = sampleMoodLogs.find { it.dateLogged == date }?.mood
+            MoodDayItem(date, moodForDay)
+        }
+    }
+}
+
+@SuppressLint("NewApi")
+@Composable
+fun MoodDayItem(date: LocalDate, mood: MoodType?) {
+    val moodColor = when (mood) {
+        MoodType.HAPPY -> Color.Green
+        MoodType.SAD -> Color.Blue
+        MoodType.NEUTRAL -> Color.Gray
+        MoodType.ANGRY -> Color.Red
+        MoodType.ANXIOUS -> Color.Yellow
+        null -> Color.LightGray
+    }
+
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .padding(4.dp)
+            .background(moodColor, shape = CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = date.dayOfMonth.toString(),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+
 }

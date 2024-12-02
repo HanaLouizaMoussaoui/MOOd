@@ -28,14 +28,13 @@ fun TopBar(
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.tertiary,
         contentColor = Color.Black,
-        modifier = Modifier.height(60.dp)
+        modifier = Modifier.height(50.dp)
     ) {
 
         Text("My MOOd")
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
