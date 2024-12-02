@@ -76,18 +76,19 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //remove(moodTypeRepository)
         seedDatabase(moodTypeRepository)
 
         setContent {
             val moodTypes = getMoodTypes()
 
             val sampleMoodLogs = listOf(
-                MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.ordinal), LocalDate.of(2024, 11, 1)),
-                MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.ordinal), LocalDate.of(2024, 11, 2)),
-                MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.ordinal), LocalDate.of(2024, 11, 3)),
-                MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.ordinal), LocalDate.of(2024, 11, 4)),
-                MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.ordinal), LocalDate.of(2024, 11, 5)),
-                MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.ordinal), LocalDate.of(2024, 11, 6)),
+                MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id), LocalDate.of(2024, 12, 1)),
+                MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id), LocalDate.of(2024, 12, 2)),
+                MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id), LocalDate.of(2024, 12, 3)),
+                MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id), LocalDate.of(2024, 12, 4)),
+                MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id), LocalDate.of(2024, 12, 5)),
+                MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id), LocalDate.of(2024, 12, 6)),
             )
             var user: User? = null
             Box(modifier = Modifier.fillMaxSize()) {
@@ -160,9 +161,8 @@ fun remove(moodTypeRepository: MoodTypeRepository) {
     CoroutineScope(Dispatchers.IO).launch {
         val moodTypes = moodTypeRepository.getAllMoodTypes()
         moodTypes.forEach {
-            if (it.id == 10){
-                moodTypeRepository.delete(it)
-            }
+            moodTypeRepository.delete(it)
+
         }
     }
 }
@@ -337,7 +337,7 @@ fun MoodCalendar(monthLogs: List<MoodHistory>, user: User?, moodTypeRepository: 
 
             LaunchedEffect(moodForDay) {
                 moodForDay?.let {
-                    moodType.value = moodTypeRepository.getMoodTypeById(it.userMoodId.typeId)
+                    moodType.value = moodTypeRepository.getMoodTypeByName(MoodTypeEnum.values().find { enum -> enum.id == it.userMoodId.typeId }?.mood ?: "")
                 }
             }
 

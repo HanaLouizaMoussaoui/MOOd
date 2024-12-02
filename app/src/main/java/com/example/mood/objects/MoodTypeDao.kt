@@ -23,6 +23,6 @@ interface MoodTypeDao {
     @Query("SELECT * FROM mood_type")
     suspend fun getAllMoodTypes(): List<MoodType>
 
-    @Query("SELECT * FROM mood_type WHERE id = :moodTypeId")
-    suspend fun getMoodTypeById(moodTypeId: Int): MoodType
+    @Query("SELECT * FROM mood_type WHERE name = :moodTypeName")
+    suspend fun getMoodTypeByName(moodTypeName: String): MoodType
 }

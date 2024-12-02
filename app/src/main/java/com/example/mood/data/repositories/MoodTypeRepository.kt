@@ -20,8 +20,8 @@ class MoodTypeRepository(private val moodTypeDao: MoodTypeDao) :MoodTypeDao {
         return moodTypeDao.getAllMoodTypes()
     }
 
-    override suspend fun getMoodTypeById(moodTypeId: Int): MoodType {
-        return moodTypeDao.getMoodTypeById(moodTypeId)
+    override suspend fun getMoodTypeByName(moodTypeName: String): MoodType {
+        return moodTypeDao.getMoodTypeByName(moodTypeName)
     }
 
 }
