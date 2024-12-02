@@ -59,7 +59,7 @@ fun LogMoodScreen(contentPadding: PaddingValues) {
             verticalArrangement = Arrangement.Top // Align items at the top
         ) {
             TopBar {  }
-            NavBar { }
+            NavBar{}
             LogMood()
         }
     }
@@ -154,7 +154,7 @@ fun MoodSelectionPage() {
         Text(
             text = "Your mood history:",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(16.dp)
         )
         MoodCalendar()
 
@@ -218,7 +218,7 @@ fun MoodDayItem(date: LocalDate, mood: MoodType?) {
         MoodType.NEUTRAL -> Color.Gray
         MoodType.ANGRY -> Color.Red
         MoodType.ANXIOUS -> Color.Yellow
-        null -> Color.LightGray
+        null -> MaterialTheme.colorScheme.secondary
     }
 
     Box(

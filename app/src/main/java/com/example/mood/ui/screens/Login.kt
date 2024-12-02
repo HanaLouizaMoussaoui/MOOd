@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -18,6 +20,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -25,19 +28,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mood.ui.NavBar
+import com.example.mood.ui.TopBar
+import com.example.mood.ui.theme.MOOdTheme
 
 
 @Composable
 fun LoginScreen(contentPadding: PaddingValues) {
-    Column(
-        modifier = Modifier
-            .padding(contentPadding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top // Align items at the top
-    ) {
-        NavBar { }
-        Login()
+    MOOdTheme {
+        Column(
+            modifier = Modifier
+                .padding(contentPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top // Align items at the top
+        ) {
+            Login()
+        }
     }
+
 }
 
 
@@ -57,9 +64,16 @@ fun Login() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        Icon(
+            painter = painterResource(id = com.example.mood.R.drawable.ic_launcher_foreground),
+
+            contentDescription = "Home icon",
+            tint = Color.Black
+        )
         Text(
             text = "Login",
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
@@ -102,7 +116,7 @@ fun Login() {
         ) {
             Text(
                 text = "Sign Up",
-                style = MaterialTheme.typography.displayMedium,
+                style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
@@ -135,11 +149,17 @@ fun Login() {
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation()
             )
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Sign Up Button
             Button(
                 onClick = { /* Handle Login */ },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black, // Background color
+                    contentColor = Color.White  // Text color
+                ),
+
             ) {
                 Text("Sign Up")
             }

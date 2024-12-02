@@ -14,13 +14,13 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = BrightCyan,
     secondary = GreyIsh,
-    tertiary = LightGreyIsh
+    tertiary = LightGrey
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = BrightCyan,
     secondary = GreyIsh,
-    tertiary = LightGreyIsh
+    tertiary = LightGrey
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -41,8 +41,6 @@ fun MOOdTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

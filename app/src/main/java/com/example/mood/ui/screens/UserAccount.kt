@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Tab
@@ -24,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -31,19 +34,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mood.ui.NavBar
+import com.example.mood.ui.TopBar
+import com.example.mood.ui.theme.MOOdTheme
 
 
 @Composable
 fun UserAccountScreen(contentPadding: PaddingValues) {
-    Column(
-        modifier = Modifier
-            .padding(contentPadding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top // Align items at the top
-    ) {
-        NavBar { }
-        UserAccount()
+    MOOdTheme {
+        Column(
+            modifier = Modifier
+                .padding(contentPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            TopBar {}
+            NavBar { }
+            UserAccount()
+        }
     }
+
 }
 
 
@@ -59,10 +68,17 @@ fun UserAccount() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        Icon(
+            painter = painterResource(id = com.example.mood.R.drawable.user),
+            contentDescription = "Account icon",
+            tint = Color.Black,
+            modifier = Modifier.size(100.dp)
+        )
         Text(
             text = "Username",
             style = MaterialTheme.typography.displayMedium,
