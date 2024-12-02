@@ -2,12 +2,9 @@ package com.example.mood.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalDateTime
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import java.time.Instant
-import java.time.ZoneOffset
 import com.example.mood.converters.LocalDateTimeConverter
+import java.time.LocalDateTime
 
 @Entity(tableName = "user")
 @TypeConverters(LocalDateTimeConverter::class)

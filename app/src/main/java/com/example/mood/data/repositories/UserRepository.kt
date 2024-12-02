@@ -2,7 +2,6 @@ package com.example.mood.data.repositories
 
 import com.example.mood.model.User
 import com.example.mood.objects.UserDao
-import kotlinx.coroutines.flow.Flow
 
 class UserRepository(private val userDao: UserDao) : UserDao{
     override suspend fun insert(user: User) {
