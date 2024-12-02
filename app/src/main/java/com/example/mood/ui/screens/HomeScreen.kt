@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.mood.R
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
@@ -30,7 +32,7 @@ import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 
 @Composable
-fun HomeScreen(contentPadding: PaddingValues) {
+fun HomeScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
     MOOdTheme {
         Column(
             modifier = Modifier
@@ -38,16 +40,22 @@ fun HomeScreen(contentPadding: PaddingValues) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            TopBar {  }
-            NavBar { }
+            TopBar { navController.navigate("UserAccount") }
+            NavBar(
+                onHomeClick = { navController.navigate("HomeScreen") },
+                onLogClick = { navController.navigate("LogMood") }
+            )
+
             MoodChat()
         }
     }
 }
 
+
 @Composable
 fun MoodChat(){
-    Column(){
+    Column(        modifier = Modifier
+        .fillMaxSize()){
         AIPromptBox()
     }
 }
@@ -62,7 +70,8 @@ fun AIPromptBox(moodViewModel: MoodViewModel = MoodViewModel()) {
     val uiState by moodViewModel.uiState.collectAsState()
 
     Column(modifier = Modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+
     ){
         LazyColumn {
             items(results) { resultItem ->
@@ -102,11 +111,5 @@ fun AIPromptBox(moodViewModel: MoodViewModel = MoodViewModel()) {
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview(){
-    HomeScreen(PaddingValues(8.dp))
 }
 

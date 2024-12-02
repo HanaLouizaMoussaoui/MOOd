@@ -39,18 +39,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.mood.model.MoodHistory
 import com.example.mood.model.MoodType
 import com.example.mood.model.User
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.ui.theme.MOOdTheme
+import com.example.mood.viewmodel.MoodViewModel
 import java.time.LocalDate
 import java.time.YearMonth
 
 
 @Composable
-fun LogMoodScreen(contentPadding: PaddingValues) {
+fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
     MOOdTheme {
         Column(
             modifier = Modifier
@@ -58,8 +60,11 @@ fun LogMoodScreen(contentPadding: PaddingValues) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top // Align items at the top
         ) {
-            TopBar {  }
-            NavBar{}
+            TopBar { navController.navigate("UserAccount") }
+            NavBar(
+                onHomeClick = { navController.navigate("HomeScreen") },
+                onLogClick = { navController.navigate("LogMood") }
+            )
             LogMood()
         }
     }
@@ -67,11 +72,6 @@ fun LogMoodScreen(contentPadding: PaddingValues) {
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun LogMoodPreview() {
-    LogMoodScreen(PaddingValues(8.dp))
-}
 
 @Composable
 fun LogMood() {
@@ -80,8 +80,6 @@ fun LogMood() {
         MoodSelectionPage()
 
     }
-
-
 }
 
 
