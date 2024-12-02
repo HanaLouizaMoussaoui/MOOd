@@ -46,22 +46,22 @@ fun HomeScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  nav
                 onLogClick = { navController.navigate("LogMood") }
             )
 
-            MoodChat()
+            MoodChat(moodViewModel)
         }
     }
 }
 
 
 @Composable
-fun MoodChat(){
+fun MoodChat(moodViewModel: MoodViewModel){
     Column(        modifier = Modifier
         .fillMaxSize()){
-        AIPromptBox()
+        AIPromptBox(moodViewModel)
     }
 }
 
 @Composable
-fun AIPromptBox(moodViewModel: MoodViewModel = MoodViewModel()) {
+fun AIPromptBox(moodViewModel: MoodViewModel) {
     val placeholderPrompt = stringResource(R.string.prompt_placeholder)
     val placeholderResult = stringResource(R.string.results_placeholder)
     var prompt by rememberSaveable { mutableStateOf(placeholderPrompt) }
