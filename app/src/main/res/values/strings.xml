@@ -1,5 +1,3 @@
 <resources>
     <string name="app_name">MOOd</string>
-    <string name="prompt_placeholder">Today I am feeling: </string>
-    <string name="results_placeholder">(Results will appear here)</string>
 </resources>
