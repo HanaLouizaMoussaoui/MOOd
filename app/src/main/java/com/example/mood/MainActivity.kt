@@ -12,7 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mood.data.DatabaseProvider
-import com.example.mood.data.MoodRepository
+import com.example.mood.data.repositories.MoodTypeRepository
+import com.example.mood.data.repositories.UserMoodHistoryRepository
+import com.example.mood.data.repositories.UserMoodRepository
+import com.example.mood.data.repositories.UserRepository
 import com.example.mood.ui.screens.HomeScreen
 import com.example.mood.ui.screens.LogMoodScreen
 import com.example.mood.ui.screens.Login
@@ -20,19 +23,35 @@ import com.example.mood.ui.screens.LoginScreen
 import com.example.mood.ui.screens.UserAccountScreen
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
+import com.example.mood.viewmodel.MoodViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
-    private val moodRepository: MoodRepository by lazy {
+    private val userRepository: UserRepository by lazy {
         val database = DatabaseProvider.AppDatabase.getDatabase(this)
-        MoodRepository(database.userDao())
+        UserRepository(database.userDao())
+    }
+    private val moodTypeRepository: MoodTypeRepository by lazy {
+        val database = DatabaseProvider.AppDatabase.getDatabase(this)
+        MoodTypeRepository(database.moodTypeDao())
+    }
+    private val userMoodRepository: UserMoodRepository by lazy {
+        val database = DatabaseProvider.AppDatabase.getDatabase(this)
+        UserMoodRepository(database.userMoodDao())
+    }
+    private val userMoodHistoryRepository: UserMoodHistoryRepository by lazy {
+        val database = DatabaseProvider.AppDatabase.getDatabase(this)
+        UserMoodHistoryRepository(database.userMoodHistoryDao())
+    }
+
+    private val moodViewModel: MoodViewModel by viewModels {
+        MoodViewModelFactory(userRepository, userMoodRepository, userMoodHistoryRepository, moodTypeRepository)
     }
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MOOdTheme {
-                val moodViewModel: MoodViewModel by viewModels()
 
                 Router(moodViewModel)
 

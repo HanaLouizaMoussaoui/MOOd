@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,11 +44,14 @@ import androidx.navigation.NavHostController
 import com.example.mood.model.MoodHistory
 import com.example.mood.model.MoodType
 import com.example.mood.model.User
+import com.example.mood.model.UserMood
+import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 
 
@@ -65,7 +69,7 @@ fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  
                 onHomeClick = { navController.navigate("HomeScreen") },
                 onLogClick = { navController.navigate("LogMood") }
             )
-            LogMood()
+            LogMood(moodViewModel)
         }
     }
 }
@@ -74,10 +78,10 @@ fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  
 
 
 @Composable
-fun LogMood() {
+fun LogMood(moodViewModel: MoodViewModel) {
     Column(
     ) {
-        MoodSelectionPage()
+        MoodSelectionPage(moodViewModel)
 
     }
 }
@@ -85,7 +89,7 @@ fun LogMood() {
 
 
 @Composable
-fun MoodSelectionPage() {
+fun MoodSelectionPage(moodViewModel: MoodViewModel) {
     val moods = listOf("Angry", "Sad", "Happy", "Ecstatic")
     var selectedMood by remember { mutableStateOf("") }
     var thoughts by remember { mutableStateOf("") }
@@ -154,7 +158,7 @@ fun MoodSelectionPage() {
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(16.dp)
         )
-        MoodCalendar()
+        MoodCalendar(moodViewModel)
 
 
 
@@ -181,42 +185,45 @@ fun MoodButton(mood: String, isSelected: Boolean, onClick: () -> Unit) {
 
 @SuppressLint("NewApi")
 @Composable
-fun MoodCalendar() {
+fun MoodCalendar(moodViewModel: MoodViewModel) {
     val sampleMoodLogs = listOf(
-        MoodHistory(1, 1, MoodType.HAPPY, LocalDate.of(2024, 12, 1)),
-        MoodHistory(2, 1, MoodType.SAD, LocalDate.of(2024, 12, 2)),
-        MoodHistory(3, 1, MoodType.NEUTRAL, LocalDate.of(2024, 12, 3)),
-        MoodHistory(4, 1, MoodType.ANXIOUS, LocalDate.of(2024, 12, 4)),
-        MoodHistory(5, 1, MoodType.HAPPY, LocalDate.of(2024, 12, 5)),
-        MoodHistory(6, 1, MoodType.ANGRY, LocalDate.of(2024, 12, 10)),
+        MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 1, 0,0)),
+        MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).id, LocalDateTime.of(2024, 12, 2,0,0)),
+        MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).id, LocalDateTime.of(2024, 12, 3,0,0)),
+        MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).id, LocalDateTime.of(2024, 12, 4,0,0)),
+        MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 5,0,0)),
+        MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).id, LocalDateTime.of(2024, 12, 6,0,0)),
     )
-    var user: User? = null
 
     val currentMonth = YearMonth.now()
     val daysInMonth = currentMonth.lengthOfMonth()
     val datesInMonth = (1..daysInMonth).map { currentMonth.atDay(it) }
+    val moodType = remember { mutableStateOf<MoodTypeEnum?>(null) }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
         contentPadding = PaddingValues(8.dp)
     ) {
         items(datesInMonth) { date ->
-            val moodForDay = sampleMoodLogs.find { it.dateLogged == date }?.mood
-            MoodDayItem(date, moodForDay)
+            moodType.value = sampleMoodLogs.find { it.dateLogged.toLocalDate() == date }?.userMoodId?.let { moodId ->
+                MoodTypeEnum.entries.find { it.id == moodId }
+            }
+            MoodDayItem(date, moodType.value)
         }
     }
 }
 
+
 @SuppressLint("NewApi")
 @Composable
-fun MoodDayItem(date: LocalDate, mood: MoodType?) {
-    val moodColor = when (mood) {
-        MoodType.HAPPY -> Color.Green
-        MoodType.SAD -> Color.Blue
-        MoodType.NEUTRAL -> Color.Gray
-        MoodType.ANGRY -> Color.Red
-        MoodType.ANXIOUS -> Color.Yellow
-        null -> MaterialTheme.colorScheme.secondary
+fun MoodDayItem(date: LocalDate, mood: MoodTypeEnum?) {
+    val moodColor = when (mood?.name) {
+        MoodTypeEnum.HAPPY.mood -> Color.Green
+        MoodTypeEnum.SAD.mood -> Color.Blue
+        MoodTypeEnum.NEUTRAL.mood -> Color.Gray
+        MoodTypeEnum.ANGRY.mood -> Color.Red
+        MoodTypeEnum.ANXIOUS.mood -> Color.Yellow
+        else -> MaterialTheme.colorScheme.secondary
     }
 
     Box(
