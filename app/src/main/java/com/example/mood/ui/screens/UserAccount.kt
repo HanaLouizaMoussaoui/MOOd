@@ -33,13 +33,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.ui.theme.MOOdTheme
+import com.example.mood.viewmodel.MoodViewModel
 
 
 @Composable
-fun UserAccountScreen(contentPadding: PaddingValues) {
+fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController) {
     MOOdTheme {
         Column(
             modifier = Modifier
@@ -47,21 +49,17 @@ fun UserAccountScreen(contentPadding: PaddingValues) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            TopBar {}
-            NavBar { }
+            TopBar { navController.navigate("UserAccount") }
+            NavBar(
+                onHomeClick = { navController.navigate("HomeScreen") },
+                onLogClick = { navController.navigate("LogMood") }
+            )
             UserAccount()
         }
     }
 
 }
 
-
-
-@Preview(showBackground = true)
-@Composable
-fun UserAccountPreview() {
-    UserAccountScreen(PaddingValues(8.dp))
-}
 
 @Composable
 fun UserAccount() {
