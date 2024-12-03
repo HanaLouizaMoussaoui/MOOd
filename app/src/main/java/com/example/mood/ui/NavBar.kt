@@ -1,6 +1,9 @@
 package com.example.mood.ui
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,44 +27,51 @@ fun NavBar(
     onHomeClick: () -> Unit,
     onLogClick: () -> Unit
 ) {
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.secondary,
-        contentColor = Color.Black,
-        modifier = Modifier.height(70.dp)
-            .fillMaxWidth(),
 
-    ) {
-        Column  (
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(start = 40.dp )
-        ){
-            IconButton(onClick = onHomeClick,
-                modifier = Modifier.height(20.dp)) {
-                Icon(
-                painter = painterResource(id = R.drawable.home),
 
-                 contentDescription = "Home icon",
-                 tint = Color.Black
-                 )
+        BottomAppBar(
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.height(70.dp)
+                .fillMaxWidth(),
 
+            ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(start = 40.dp)
+            ) {
+                IconButton(
+                    onClick = onHomeClick,
+                    modifier = Modifier.height(20.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.home),
+
+                        contentDescription = "Home icon",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+
+                }
+                Text("Dashboard")
             }
-            Text("Dashboard")
-        }
-        Spacer(modifier = Modifier.width(120.dp))
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            IconButton(onClick = onLogClick,
-                modifier = Modifier.height(20.dp)) {
-                 Icon(
-                 painter = painterResource(id = R.drawable.bookmark),
-                  contentDescription = "hello",
-                 tint = Color.Black
-                 )
+            Spacer(modifier = Modifier.width(120.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(
+                    onClick = onLogClick,
+                    modifier = Modifier.height(20.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.bookmark),
+                        contentDescription = "hello",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
 
+                }
+                Text("Log a Mood")
             }
-            Text("Log a Mood")
+
         }
 
-    }
 }

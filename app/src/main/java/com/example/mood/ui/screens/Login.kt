@@ -1,6 +1,8 @@
 package com.example.mood.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +31,9 @@ import com.example.mood.viewmodel.MoodViewModel
 
 @Composable
 fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
-    MOOdTheme {
+
+
+
         Column(
             modifier = Modifier
                 .padding(contentPadding),
@@ -38,7 +42,7 @@ fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  na
         ) {
             Login()
         }
-    }
+
 
 }
 
