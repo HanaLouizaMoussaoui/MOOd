@@ -5,8 +5,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.dp
@@ -23,7 +28,7 @@ import com.example.mood.model.MoodType
 import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.screens.HomeScreen
 import com.example.mood.ui.screens.LogMoodScreen
-import com.example.mood.ui.screens.LoginScreen
+import com.example.mood.ui.screens.SelectionBar
 import com.example.mood.ui.screens.RegisterScreen
 import com.example.mood.ui.screens.UserAccountScreen
 import com.example.mood.ui.theme.MOOdTheme
@@ -64,8 +69,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         seedDatabase(moodTypeRepository)
         setContent {
-            MOOdTheme {
-                Router(moodViewModel)
+            var selectedTheme by remember { mutableStateOf("Default") }
+
+            MOOdTheme (themeMode = selectedTheme){
+
+                Router(moodViewModel, onThemeSelect = { selectedTheme = it } )
+
             }
         }
     }
