@@ -57,15 +57,14 @@ fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewMode
                 )
                 UserAccount(onThemeSelected)
             }
+
         }
-
-
 
 }
 
 
 @Composable
-fun UserAccount(onThemeSelected: (String) -> Unit) {
+fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()

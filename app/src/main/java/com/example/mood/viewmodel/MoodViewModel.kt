@@ -8,6 +8,7 @@ import com.example.mood.data.repositories.MoodTypeRepository
 import com.example.mood.data.repositories.UserMoodHistoryRepository
 import com.example.mood.data.repositories.UserMoodRepository
 import com.example.mood.data.repositories.UserRepository
+import com.example.mood.model.User
 import com.example.mood.ui.UiState
 import com.google.ai.client.generativeai.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class MoodViewModel(
     val userRepository: UserRepository,
@@ -24,6 +26,11 @@ class MoodViewModel(
     val userMoodHistoryRepository: UserMoodHistoryRepository,
     val moodTypeRepository: MoodTypeRepository
 ) : ViewModel() {
+    //variables for user:
+    private val _currentUser = MutableStateFlow<User?>(null)  // Track logged-in user
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+
+    // variables for AI:
     private val _uiState: MutableStateFlow<UiState> =
         MutableStateFlow(UiState.Initial)
     val uiState: StateFlow<UiState> =
@@ -79,6 +86,27 @@ class MoodViewModel(
         val isLoading: Boolean = false
     )
 
+    suspend fun checkUserExistsByEmail(email: String): Boolean{
+         return userRepository.getUserByEmail(email) != null
+    }
+
+    suspend fun createUser(email: String, password:String) {
+        val currentTime = LocalDateTime.now()
+        val user = User(name = "newUser", email = email, password = password, createdAt = currentTime, editedAt = currentTime, profilePicture = "")
+        userRepository.insert(user)
+    }
+
+    // returns the user object if it exists, otherwise null
+    suspend fun loginUser(email: String, password: String): User?{
+        val user = userRepository.getUserByEmail(email)
+        // making sure the password matches
+        return if (user != null && password == user.password){
+            _currentUser.value = user
+            user
+        } else {
+            null
+        }
+    }
 }
 
 class MoodViewModelFactory(
