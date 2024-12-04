@@ -15,6 +15,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,8 +28,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.mood.data.repositories.UserRepository
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -36,22 +43,16 @@ fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  na
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top // Align items at the top
         ) {
-            Login()
+            Login(navController)
         }
     }
-
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-
 }
 
 @Composable
-fun Login() {
+fun Login(navController: NavHostController) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -74,8 +75,8 @@ fun Login() {
 
         // Email TextField
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = "email",
+            onValueChange = {email = it},
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -84,8 +85,8 @@ fun Login() {
 
         // Password TextField
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = "password",
+            onValueChange = {password = it},
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation()
@@ -94,71 +95,30 @@ fun Login() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* Handle Login */ },
-            modifier = Modifier.fillMaxWidth()
+            onClick = { loginUser() },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black, // Background color
+                contentColor = Color.White  // Text color
+            )
         ) {
             Text("Login")
         }
 
-
-        // Sign Up
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Sign Up",
-                style = MaterialTheme.typography.displaySmall,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
-            // Email TextField
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Password TextField
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Password TextField
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                label = { Text("Confirm Password") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Sign Up Button
-            Button(
-                onClick = { /* Handle Login */ },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black, // Background color
-                    contentColor = Color.White  // Text color
-                ),
-
-            ) {
-                Text("Sign Up")
-            }
+        Button(onClick = {
+            navController.navigate("Register")
+        },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Cyan, // Background color
+                contentColor = Color.White  // Text color
+            ),) {
+            Text("Go Register")
         }
     }
+}
+
+fun loginUser(){
+
 }
 
