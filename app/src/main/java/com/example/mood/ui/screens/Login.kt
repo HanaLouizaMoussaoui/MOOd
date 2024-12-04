@@ -1,5 +1,6 @@
 package com.example.mood.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,21 +36,18 @@ import com.example.mood.model.User
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 import kotlinx.coroutines.launch
+import com.example.mood.ui.theme.BrightCyan
 
 
 @Composable
 fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
-
-
-
-        Column(
-            modifier = Modifier
-                .padding(contentPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top // Align items at the top
-        ) {
+    Column(
+        modifier = Modifier
+            .padding(contentPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top // Align items at the top
+    ) {
             Login(navController, moodViewModel)
-        }
     }
 }
 
@@ -68,12 +66,11 @@ fun Login(navController: NavHostController, moodViewModel: MoodViewModel) {
         verticalArrangement = Arrangement.Center
     ) {
 
-        Icon(
-            painter = painterResource(id = com.example.mood.R.drawable.ic_launcher_foreground),
-
+        Image(
+            painter = painterResource(id = com.example.mood.R.drawable.mood),
             contentDescription = "Home icon",
-            tint = Color.Black
         )
+
         Text(
             text = "Login",
             style = MaterialTheme.typography.displaySmall,
@@ -137,7 +134,7 @@ fun Login(navController: NavHostController, moodViewModel: MoodViewModel) {
         },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Cyan, // Background color
+                containerColor = BrightCyan, // Background color
                 contentColor = Color.White  // Text color
             ),) {
             Text("Go Register")

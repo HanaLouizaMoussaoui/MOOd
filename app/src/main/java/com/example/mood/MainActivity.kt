@@ -23,6 +23,7 @@ import com.example.mood.data.repositories.UserMoodRepository
 import com.example.mood.data.repositories.UserRepository
 import com.example.mood.ui.screens.HomeScreen
 import com.example.mood.ui.screens.LogMoodScreen
+import com.example.mood.ui.screens.LoginScreen
 import com.example.mood.ui.screens.SelectionBar
 import com.example.mood.ui.screens.RegisterScreen
 import com.example.mood.ui.screens.UserAccountScreen

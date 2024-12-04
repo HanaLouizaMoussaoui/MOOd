@@ -20,6 +20,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,10 +37,11 @@ import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
+import java.text.SimpleDateFormat
 
 
 @Composable
-fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController, onThemeSelected: (String) -> Unit) {
+fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController, onThemeSelect: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background))
@@ -55,16 +57,16 @@ fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewMode
                     onHomeClick = { navController.navigate("HomeScreen") },
                     onLogClick = { navController.navigate("LogMood") }
                 )
-                UserAccount(onThemeSelected)
+                UserAccount(onThemeSelect, moodViewModel)
             }
 
         }
 
 }
 
-
 @Composable
 fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel) {
+    val user =  moodViewModel.currentUser.collectAsState().value
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -72,69 +74,97 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        if (user != null) {
+            val dateFormatter = SimpleDateFormat("dd-MM-yyyy")
 
-        Icon(
-            painter = painterResource(id = com.example.mood.R.drawable.user),
-            contentDescription = "Account icon",
-            tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(100.dp)
-        )
-        Text(
-            text = "Username",
-            style = MaterialTheme.typography.displayMedium,
-            modifier = Modifier.padding(bottom = 24.dp),
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = "email@email.com",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 24.dp),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = "Theme",
-            style = MaterialTheme.typography.bodyMedium
-        )
-        SelectionBar(onThemeSelected)
+            Icon(
+                painter = painterResource(id = com.example.mood.R.drawable.user),
+                contentDescription = "Account icon",
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(100.dp)
+            )
 
-        Button(
-            onClick = { /* Handle Edit */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Edit")
+            Text(
+                text = user.name,
+                style = MaterialTheme.typography.displayMedium,
+                modifier = Modifier.padding(bottom = 24.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = user.email,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 24.dp),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = "Theme",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            SelectionBar(onThemeSelected)
+
+            Button(
+                onClick = { /* Handle Edit */ },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Edit")
+            }
+
+            // Password TextField
+            OutlinedTextField(
+                value = user.password,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = "October 30th 2024",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("First Mood Entry") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = "November 28th 2024",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Latest Mood Entry") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = user.editedAt.toString(),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Last Edited") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = user.createdAt.toString(),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Created At") },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
-        // Email TextField
-        OutlinedTextField(
-            value = "xxxx",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = "October 30th 2024",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("First Mood Entry") },
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = "November 28th 2024",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Latest Mood Entry") },
-            modifier = Modifier.fillMaxWidth(),
-        )
+        else {
+            Text("No user data found. Please exit and login.")
+        }
     }
-
-
 }
 
 @Composable
