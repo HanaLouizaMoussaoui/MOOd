@@ -8,7 +8,9 @@ import com.example.mood.data.repositories.MoodTypeRepository
 import com.example.mood.data.repositories.UserMoodHistoryRepository
 import com.example.mood.data.repositories.UserMoodRepository
 import com.example.mood.data.repositories.UserRepository
+import com.example.mood.model.MoodType
 import com.example.mood.model.User
+import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.UiState
 import com.google.ai.client.generativeai.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
@@ -21,10 +23,10 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class MoodViewModel(
-    val userRepository: UserRepository,
-    val userMoodRepository: UserMoodRepository,
-    val userMoodHistoryRepository: UserMoodHistoryRepository,
-    val moodTypeRepository: MoodTypeRepository
+    private val userRepository: UserRepository,
+    private val userMoodRepository: UserMoodRepository,
+    private val userMoodHistoryRepository: UserMoodHistoryRepository,
+    private val moodTypeRepository: MoodTypeRepository
 ) : ViewModel() {
     //variables for user:
     private val _currentUser = MutableStateFlow<User?>(null)  // Track logged-in user
@@ -106,6 +108,17 @@ class MoodViewModel(
         } else {
             null
         }
+    }
+
+    suspend fun getAllMoodTypes(): List<MoodTypeEnum> {
+        val moodTypes = moodTypeRepository.getAllMoodTypes()
+        return moodTypes.mapNotNull { moodType ->
+            MoodTypeEnum.entries.find { it.mood == moodType.name }
+        }
+    }
+
+    suspend fun checkMoodTypeExists(moodTypeName: String): Boolean {
+        return moodTypeRepository.getMoodTypeByName(moodTypeName) != null
     }
 }
 

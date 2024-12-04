@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +28,6 @@ import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.screens.HomeScreen
 import com.example.mood.ui.screens.LogMoodScreen
 import com.example.mood.ui.screens.LoginScreen
-import com.example.mood.ui.screens.SelectionBar
 import com.example.mood.ui.screens.RegisterScreen
 import com.example.mood.ui.screens.UserAccountScreen
 import com.example.mood.ui.theme.MOOdTheme
@@ -69,6 +67,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         seedDatabase(moodTypeRepository)
+        //remove()
         setContent {
             var selectedTheme by remember { mutableStateOf("Default") }
 
@@ -81,7 +80,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Router(moodViewModel: MoodViewModel) {
+    fun Router(moodViewModel: MoodViewModel, onThemeSelect: (String) -> Unit) {
         // Setting the nav controller
         val navController = rememberNavController()
         CompositionLocalProvider(localNavController provides navController) {
@@ -89,13 +88,21 @@ class MainActivity : ComponentActivity() {
                 // Defining the routes and their corresponding screens
                 composable("LoginScreenRoute") { LoginScreen(PaddingValues(8.dp), moodViewModel) }
                 composable("HomeScreen") { HomeScreen(PaddingValues(8.dp), moodViewModel) }
-                composable("UserAccount") { UserAccountScreen(PaddingValues(8.dp), moodViewModel) }
+                composable("UserAccount") { UserAccountScreen(PaddingValues(8.dp), moodViewModel, onThemeSelect) }
                 composable("LogMood") { LogMoodScreen(PaddingValues(8.dp), moodViewModel) }
                 composable("Register") { RegisterScreen(PaddingValues(8.dp), moodViewModel) }
             }
         }
     }
 
+    private fun remove(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val moods = moodTypeRepository.getAllMoodTypes()
+            moods.forEach {
+                moodTypeRepository.delete(it)
+            }
+        }
+    }
 
     private fun seedDatabase(moodTypeRepository: MoodTypeRepository) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -104,6 +111,14 @@ class MainActivity : ComponentActivity() {
                 val moodTypes = MoodTypeEnum.entries.map { MoodType(name = it.mood) }
                 moodTypes.forEach {
                     moodTypeRepository.insert(it)
+                }
+            }
+            else {
+                val moodTypes = MoodTypeEnum.entries.map { MoodType(name = it.mood) }
+                moodTypes.forEach {
+                    if (!moodViewModel.checkMoodTypeExists(it.name)) {
+                        moodTypeRepository.insert(it)
+                    }
                 }
             }
         }
