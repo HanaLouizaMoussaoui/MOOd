@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.mood.localNavController
+import com.example.mood.ui.theme.BrightCyan
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ fun RegisterScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel )
 
 @Composable
 fun Register(moodViewModel: MoodViewModel){
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -66,6 +68,16 @@ fun Register(moodViewModel: MoodViewModel){
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(bottom = 24.dp)
         )
+
+        // Username textfield
+        OutlinedTextField(
+            value = username,
+            onValueChange = {username = it},
+            label = { Text("Username") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Email TextField
         OutlinedTextField(
@@ -112,7 +124,7 @@ fun Register(moodViewModel: MoodViewModel){
             onClick = {
                 // attempts to create a new user
                 coroutineScope.launch {
-                    val result = createUser(email, password, confirmPassword, moodViewModel)
+                    val result = createUser(username, email, password, confirmPassword, moodViewModel)
                     if (result.isEmpty()) {
                         navController.navigate("LoginScreenRoute") // navigate to the login screen
                     } else {
@@ -134,7 +146,7 @@ fun Register(moodViewModel: MoodViewModel){
         },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Cyan, // Background color
+                containerColor = BrightCyan, // Background color
                 contentColor = Color.White  // Text color
             ),) {
             Text("Go Login")
@@ -142,9 +154,9 @@ fun Register(moodViewModel: MoodViewModel){
     }
 }
 
-suspend fun createUser(email: String, password: String, confirmPassword: String, moodViewModel: MoodViewModel): String{
+suspend fun createUser(username: String, email: String, password: String, confirmPassword: String, moodViewModel: MoodViewModel): String{
     // checking for no content
-    if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()){
+    if (username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()){
         return "Fields cannot be empty."
     }
 
@@ -157,7 +169,7 @@ suspend fun createUser(email: String, password: String, confirmPassword: String,
     return if (moodViewModel.checkUserExistsByEmail(email)) {
         "User already exists. Please choose a different email or login."
     } else {
-        moodViewModel.createUser(email, password)
+        moodViewModel.createUser(username, email, password)
         return ""
     }
 }

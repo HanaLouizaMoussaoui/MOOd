@@ -1,5 +1,6 @@
 package com.example.mood.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -38,6 +40,8 @@ import com.example.mood.viewmodel.MoodViewModel
 fun HomeScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel) {
 
     val navController = localNavController.current
+    val user =  moodViewModel.currentUser.collectAsState().value
+
     Box(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background))
@@ -54,9 +58,28 @@ fun HomeScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel) {
                 onLogClick = { navController.navigate("LogMood") }
             )
 
+            if (user != null){
+                WelcomeBox(user)
+            }
+
             MoodChat(moodViewModel)
         }
     }
+}
+
+@Composable
+fun WelcomeBox(user: User){
+
+    Image(
+       painterResource(id = com.example.mood.R.drawable.mood),
+        contentDescription = "Home icon"
+    )
+    Text(
+        text = "Hi there, ${user.name}!",
+        style = MaterialTheme.typography.displaySmall,
+        modifier = Modifier.padding(bottom = 24.dp),
+        color = MaterialTheme.colorScheme.primary
+    )
 }
 
 

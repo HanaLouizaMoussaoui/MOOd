@@ -1,5 +1,7 @@
 package com.example.mood.ui.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,6 +36,7 @@ import com.example.mood.model.User
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 import kotlinx.coroutines.launch
+import com.example.mood.ui.theme.BrightCyan
 
 
 @Composable
@@ -66,12 +69,11 @@ fun Login(moodViewModel: MoodViewModel) {
         verticalArrangement = Arrangement.Center
     ) {
 
-        Icon(
-            painter = painterResource(id = com.example.mood.R.drawable.ic_launcher_foreground),
-
+        Image(
+            painter = painterResource(id = com.example.mood.R.drawable.mood),
             contentDescription = "Home icon",
-            tint = Color.Black
         )
+
         Text(
             text = "Login",
             style = MaterialTheme.typography.displaySmall,
@@ -135,7 +137,7 @@ fun Login(moodViewModel: MoodViewModel) {
         },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Cyan, // Background color
+                containerColor = BrightCyan, // Background color
                 contentColor = Color.White  // Text color
             ),) {
             Text("Go Register")

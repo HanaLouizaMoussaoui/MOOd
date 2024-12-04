@@ -28,6 +28,7 @@ import com.example.mood.model.MoodType
 import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.screens.HomeScreen
 import com.example.mood.ui.screens.LogMoodScreen
+import com.example.mood.ui.screens.LoginScreen
 import com.example.mood.ui.screens.SelectionBar
 import com.example.mood.ui.screens.RegisterScreen
 import com.example.mood.ui.screens.UserAccountScreen
