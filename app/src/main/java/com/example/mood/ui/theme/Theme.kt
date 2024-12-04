@@ -9,18 +9,23 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = BrightCyan,
-    secondary = GreyIsh,
-    tertiary = LightGrey
+    secondary = DarkerGreyPurple,
+    tertiary = DarkGreyPurple,
+    background = DarkestGrey,
+    onSurface = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = BrightCyan,
     secondary = GreyIsh,
-    tertiary = LightGrey
+    tertiary = LightGrey,
+    background = Color.White,
+    onSurface = Color.Black
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -35,15 +40,16 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun MOOdTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    themeMode: String = "Default", // "Light", "Dark", or "Default"
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val darkTheme = when (themeMode) {
+        "Light" -> false
+        "Dark" -> true
+            else -> isSystemInDarkTheme()
     }
+
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

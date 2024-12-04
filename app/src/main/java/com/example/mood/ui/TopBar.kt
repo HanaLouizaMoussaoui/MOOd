@@ -22,7 +22,7 @@ fun TopBar(
 ) {
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.tertiary,
-        contentColor = Color.Black,
+        contentColor = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.height(50.dp)
     ) {
         Box(
@@ -32,7 +32,7 @@ fun TopBar(
         ) {
             Text(
                 text = "My MOOd",
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -44,7 +44,7 @@ fun TopBar(
                 Icon(
                     painter = painterResource(id = R.drawable.user),
                     contentDescription = "Account icon",
-                    tint = Color.Black
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

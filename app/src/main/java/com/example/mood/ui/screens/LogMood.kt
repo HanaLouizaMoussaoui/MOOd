@@ -45,7 +45,12 @@ import java.time.YearMonth
 
 @Composable
 fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
-    MOOdTheme {
+
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .background(MaterialTheme.colorScheme.background))
+    {
         Column(
             modifier = Modifier
                 .padding(contentPadding),
@@ -60,7 +65,9 @@ fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  
             LogMood(moodViewModel)
         }
     }
-}
+    }
+
+
 
 
 
@@ -90,7 +97,8 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
         Text(
             text = "How are you feeling today?",
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(24.dp),
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         // Mood Buttons Row
@@ -111,14 +119,16 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
             Text(
                 text = "You selected: $selectedMood",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
         OutlinedTextField(
             value = thoughts,
             onValueChange = { thoughts = it },
-            label = { Text("Any thoughts?") },
+            label = { Text("Any thoughts?",
+                color = MaterialTheme.colorScheme.onSurface) },
             placeholder = { Text("Type your thoughts here...") },
             modifier = Modifier.fillMaxWidth()
                 .padding(24.dp)
@@ -143,7 +153,8 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
         Text(
             text = "Your mood history:",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            color = MaterialTheme.colorScheme.onSurface
         )
         MoodCalendar(moodViewModel)
 
@@ -159,7 +170,7 @@ fun MoodButton(mood: String, isSelected: Boolean, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color.Gray else MaterialTheme.colorScheme.tertiary,
+            containerColor = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
             contentColor = Color.Black
         ),
         shape = CircleShape,
@@ -173,6 +184,15 @@ fun MoodButton(mood: String, isSelected: Boolean, onClick: () -> Unit) {
 @SuppressLint("NewApi")
 @Composable
 fun MoodCalendar(moodViewModel: MoodViewModel) {
+   // val sampleMoodLogs = listOf(
+   //     MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 1, 0,0)),
+    //    MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).id, LocalDateTime.of(2024, 12, 2,0,0)),
+     //  MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).id, LocalDateTime.of(2024, 12, 3,0,0)),
+    //    MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).id, LocalDateTime.of(2024, 12, 4,0,0)),
+  //      MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 5,0,0)),
+    //    MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).id, LocalDateTime.of(2024, 12, 6,0,0)),
+  //  )
+
     val sampleMoodLogs = listOf(
         MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 1, 0,0)),
         MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).id, LocalDateTime.of(2024, 12, 2,0,0)),
@@ -181,6 +201,7 @@ fun MoodCalendar(moodViewModel: MoodViewModel) {
         MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 5,0,0)),
         MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).id, LocalDateTime.of(2024, 12, 6,0,0)),
     )
+
 
     val currentMonth = YearMonth.now()
     val daysInMonth = currentMonth.lengthOfMonth()
@@ -204,13 +225,13 @@ fun MoodCalendar(moodViewModel: MoodViewModel) {
 @SuppressLint("NewApi")
 @Composable
 fun MoodDayItem(date: LocalDate, mood: MoodTypeEnum?) {
-    val moodColor = when (mood?.name) {
-        MoodTypeEnum.HAPPY.mood -> Color.Green
-        MoodTypeEnum.SAD.mood -> Color.Blue
-        MoodTypeEnum.NEUTRAL.mood -> Color.Gray
-        MoodTypeEnum.ANGRY.mood -> Color.Red
-        MoodTypeEnum.ANXIOUS.mood -> Color.Yellow
-        else -> MaterialTheme.colorScheme.secondary
+    val moodColor = when (mood) {
+        MoodTypeEnum.HAPPY -> Color.Green
+        MoodTypeEnum.SAD -> Color.Blue
+        MoodTypeEnum.NEUTRAL -> Color.Gray
+        MoodTypeEnum.ANGRY -> Color.Red
+        MoodTypeEnum.ANXIOUS-> Color.Yellow
+        else -> MaterialTheme.colorScheme.tertiary
     }
 
     Box(
@@ -218,7 +239,8 @@ fun MoodDayItem(date: LocalDate, mood: MoodTypeEnum?) {
             .size(40.dp)
             .padding(4.dp)
             .background(moodColor, shape = CircleShape),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+
     ) {
         Text(
             text = date.dayOfMonth.toString(),
