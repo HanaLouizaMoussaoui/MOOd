@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.mood.R
+import com.example.mood.localNavController
 import com.example.mood.model.User
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
@@ -34,9 +35,9 @@ import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 
 @Composable
-fun HomeScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
+fun HomeScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel) {
 
-
+    val navController = localNavController.current
     Box(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background))

@@ -25,12 +25,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.mood.localNavController
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController) {
+fun RegisterScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel ) {
     MOOdTheme {
         Column(
             modifier = Modifier
@@ -38,18 +39,19 @@ fun RegisterScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top // Align items at the top
         ) {
-            Register(moodViewModel, navController)
+            Register(moodViewModel)
         }
     }
 }
 
 @Composable
-fun Register(moodViewModel: MoodViewModel, navController: NavHostController){
+fun Register(moodViewModel: MoodViewModel){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+    val navController = localNavController.current
 
     // Sign Up
     Column(
@@ -112,7 +114,7 @@ fun Register(moodViewModel: MoodViewModel, navController: NavHostController){
                 coroutineScope.launch {
                     val result = createUser(email, password, confirmPassword, moodViewModel)
                     if (result.isEmpty()) {
-                        navController.navigate("login") // navigate to the login screen
+                        navController.navigate("LoginScreenRoute") // navigate to the login screen
                     } else {
                         errorMessage = result
                     }

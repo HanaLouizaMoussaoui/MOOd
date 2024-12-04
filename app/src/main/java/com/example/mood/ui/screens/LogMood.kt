@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.mood.localNavController
 import com.example.mood.model.MoodHistory
 import com.example.mood.model.UserMood
 import com.example.mood.model.enums.MoodTypeEnum
@@ -44,9 +45,9 @@ import java.time.YearMonth
 
 
 @Composable
-fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
+fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel) {
 
-
+    val navController = localNavController.current
     Box(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background))

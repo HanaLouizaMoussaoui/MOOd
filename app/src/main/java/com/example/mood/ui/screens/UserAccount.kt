@@ -17,6 +17,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,16 +28,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
-
+import com.example.mood.localNavController
 
 @Composable
-fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController) {
+fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel) {
     MOOdTheme {
+        val navController = localNavController.current
+        if (moodViewModel.currentUser.collectAsState().value == null) {
+            navController.navigate("Login")
+        }
         Column(
             modifier = Modifier
                 .padding(contentPadding),
@@ -77,7 +81,7 @@ fun UserAccount(moodViewModel: MoodViewModel) {
             modifier = Modifier.padding(bottom = 24.dp)
         )
         Text(
-            text = "email@email.com",
+            text = moodViewModel.currentUser.collectAsState().value!!.email,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(bottom = 24.dp)
         )
@@ -95,7 +99,7 @@ fun UserAccount(moodViewModel: MoodViewModel) {
         }
         // Email TextField
         OutlinedTextField(
-            value = "xxxx",
+            value = moodViewModel.currentUser.collectAsState().value!!.password,
             onValueChange = {},
             readOnly = true,
             label = { Text("Password") },

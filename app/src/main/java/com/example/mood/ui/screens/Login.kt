@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.mood.data.repositories.UserRepository
+import com.example.mood.localNavController
 import com.example.mood.model.User
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
@@ -36,7 +37,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
+fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel ) {
     MOOdTheme {
         Column(
             modifier = Modifier
@@ -44,17 +45,18 @@ fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  na
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top // Align items at the top
         ) {
-            Login(navController, moodViewModel)
+            Login(moodViewModel)
         }
     }
 }
 
 @Composable
-fun Login(navController: NavHostController, moodViewModel: MoodViewModel) {
+fun Login(moodViewModel: MoodViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+    val navController = localNavController.current
 
     Column(
         modifier = Modifier
