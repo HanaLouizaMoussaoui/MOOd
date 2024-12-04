@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -23,20 +22,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.mood.data.repositories.UserRepository
-import com.example.mood.model.User
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
+fun RegisterScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController) {
     MOOdTheme {
         Column(
             modifier = Modifier
@@ -44,18 +38,20 @@ fun LoginScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  na
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top // Align items at the top
         ) {
-            Login(navController, moodViewModel)
+            Register(moodViewModel, navController)
         }
     }
 }
 
 @Composable
-fun Login(navController: NavHostController, moodViewModel: MoodViewModel) {
+fun Register(moodViewModel: MoodViewModel, navController: NavHostController){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
+    // Sign Up
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,15 +59,8 @@ fun Login(navController: NavHostController, moodViewModel: MoodViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
-        Icon(
-            painter = painterResource(id = com.example.mood.R.drawable.ic_launcher_foreground),
-
-            contentDescription = "Home icon",
-            tint = Color.Black
-        )
         Text(
-            text = "Login",
+            text = "Register",
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(bottom = 24.dp)
         )
@@ -97,7 +86,18 @@ fun Login(navController: NavHostController, moodViewModel: MoodViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (errorMessage.isNotEmpty()) {
+        // Password TextField
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = {confirmPassword = it},
+            label = { Text("Confirm Password") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Error messages get displayed here
+        if (errorMessage != ""){
             Text(
                 text = errorMessage,
                 color = Color.Red,
@@ -105,46 +105,57 @@ fun Login(navController: NavHostController, moodViewModel: MoodViewModel) {
             )
         }
 
+        // Sign Up Button
         Button(
-            onClick = { coroutineScope.launch {
-                val errors = validateLoginInput(email, password)
-                if (errors.isNotEmpty()) {
-                    errorMessage = errors
-                } else {
-                    val user = moodViewModel.loginUser(email, password)
-                    if (user != null) {
-                        navController.navigate("HomeScreen") // Navigate to the Home screen
+            onClick = {
+                // attempts to create a new user
+                coroutineScope.launch {
+                    val result = createUser(email, password, confirmPassword, moodViewModel)
+                    if (result.isEmpty()) {
+                        navController.navigate("login") // navigate to the login screen
                     } else {
-                        errorMessage = "Invalid email or password. If you are a new user, please register."
+                        errorMessage = result
                     }
-                }
-            } },
+                }},
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black, // Background color
                 contentColor = Color.White  // Text color
-            )
-        ) {
-            Text("Login")
+            ),
+
+            ) {
+            Text("Sign Up")
         }
 
         Button(onClick = {
-            navController.navigate("Register")
+            navController.navigate("LoginScreenRoute")
         },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Cyan, // Background color
                 contentColor = Color.White  // Text color
             ),) {
-            Text("Go Register")
+            Text("Go Login")
         }
     }
 }
 
-// check if user can login
-fun validateLoginInput(email: String, password:String): String{
-    if (email.isBlank() || password.isBlank()){
+suspend fun createUser(email: String, password: String, confirmPassword: String, moodViewModel: MoodViewModel): String{
+    // checking for no content
+    if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()){
         return "Fields cannot be empty."
     }
-    else return ""
+
+    //checking for password mismatch
+    if (password != confirmPassword){
+        return "Passwords do not match."
+    }
+
+    //check if prev. registered
+    return if (moodViewModel.checkUserExistsByEmail(email)) {
+        "User already exists. Please choose a different email or login."
+    } else {
+        moodViewModel.createUser(email, password)
+        return ""
+    }
 }

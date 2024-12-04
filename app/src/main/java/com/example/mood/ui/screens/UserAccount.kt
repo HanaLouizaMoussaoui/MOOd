@@ -1,7 +1,5 @@
 package com.example.mood.ui.screens
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +13,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -26,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -39,33 +35,28 @@ import com.example.mood.viewmodel.MoodViewModel
 
 
 @Composable
-fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController, onThemeSelected: (String) -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.background))
-        {
-            Column(
-                modifier = Modifier
-                    .padding(contentPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                TopBar { navController.navigate("UserAccount") }
-                NavBar(
-                    onHomeClick = { navController.navigate("HomeScreen") },
-                    onLogClick = { navController.navigate("LogMood") }
-                )
-                UserAccount(onThemeSelected)
-            }
+fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController) {
+    MOOdTheme {
+        Column(
+            modifier = Modifier
+                .padding(contentPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            TopBar { navController.navigate("UserAccount") }
+            NavBar(
+                onHomeClick = { navController.navigate("HomeScreen") },
+                onLogClick = { navController.navigate("LogMood") }
+            )
+            UserAccount(moodViewModel)
         }
-
-
+    }
 
 }
 
 
 @Composable
-fun UserAccount(onThemeSelected: (String) -> Unit) {
+fun UserAccount(moodViewModel: MoodViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -77,26 +68,24 @@ fun UserAccount(onThemeSelected: (String) -> Unit) {
         Icon(
             painter = painterResource(id = com.example.mood.R.drawable.user),
             contentDescription = "Account icon",
-            tint = MaterialTheme.colorScheme.onSurface,
+            tint = Color.Black,
             modifier = Modifier.size(100.dp)
         )
         Text(
             text = "Username",
             style = MaterialTheme.typography.displayMedium,
-            modifier = Modifier.padding(bottom = 24.dp),
-            color = MaterialTheme.colorScheme.primary
+            modifier = Modifier.padding(bottom = 24.dp)
         )
         Text(
             text = "email@email.com",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 24.dp),
-            color = MaterialTheme.colorScheme.onSurface
+            modifier = Modifier.padding(bottom = 24.dp)
         )
         Text(
             text = "Theme",
             style = MaterialTheme.typography.bodyMedium
         )
-        SelectionBar(onThemeSelected)
+        SelectionBar()
 
         Button(
             onClick = { /* Handle Edit */ },
@@ -139,7 +128,7 @@ fun UserAccount(onThemeSelected: (String) -> Unit) {
 }
 
 @Composable
-fun SelectionBar(onThemeSelected: (String) -> Unit) {
+fun SelectionBar() {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Light", "Default", "Dark")
 
@@ -150,9 +139,8 @@ fun SelectionBar(onThemeSelected: (String) -> Unit) {
         tabs.forEachIndexed { index, title ->
             Tab(
                 selected = selectedTabIndex == index,
-                onClick = { selectedTabIndex = index
-                    onThemeSelected(title)},
-                text = { Text(text = title, color= MaterialTheme.colorScheme.onSurface) }
+                onClick = { selectedTabIndex = index },
+                text = { BasicText(text = title) }
             )
         }
     }

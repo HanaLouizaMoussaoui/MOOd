@@ -23,4 +23,8 @@ class UserRepository(private val userDao: UserDao) : UserDao{
     override suspend fun getUserById(userId: Int) : User {
         return userDao.getUserById(userId)
     }
+
+    override suspend fun getUserByEmail(email: String): User?{
+        return userDao.getUserByEmail(email)
+    }
 }
