@@ -26,6 +26,11 @@ class MoodViewModel(
     val userMoodHistoryRepository: UserMoodHistoryRepository,
     val moodTypeRepository: MoodTypeRepository
 ) : ViewModel() {
+    //variables for user:
+    private val _currentUser = MutableStateFlow<User?>(null)  // Track logged-in user
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+
+    // variables for AI:
     private val _uiState: MutableStateFlow<UiState> =
         MutableStateFlow(UiState.Initial)
     val uiState: StateFlow<UiState> =
@@ -89,6 +94,18 @@ class MoodViewModel(
         val currentTime = LocalDateTime.now()
         val user = User(name = "newUser", email = email, password = password, createdAt = currentTime, editedAt = currentTime, profilePicture = "")
         userRepository.insert(user)
+    }
+
+    // returns the user object if it exists, otherwise null
+    suspend fun loginUser(email: String, password: String): User?{
+        val user = userRepository.getUserByEmail(email)
+        // making sure the password matches
+        return if (user != null && password == user.password){
+            _currentUser.value = user
+            user
+        } else {
+            null
+        }
     }
 }
 

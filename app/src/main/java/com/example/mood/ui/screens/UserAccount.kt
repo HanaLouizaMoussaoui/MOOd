@@ -48,7 +48,7 @@ fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewMode
                 onHomeClick = { navController.navigate("HomeScreen") },
                 onLogClick = { navController.navigate("LogMood") }
             )
-            UserAccount()
+            UserAccount(moodViewModel)
         }
     }
 
@@ -56,7 +56,7 @@ fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewMode
 
 
 @Composable
-fun UserAccount() {
+fun UserAccount(moodViewModel: MoodViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
