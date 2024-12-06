@@ -163,14 +163,12 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
 @SuppressLint("NewApi")
 @Composable
 fun MoodCalendar(moodViewModel: MoodViewModel) {
-    val sampleMoodLogs = listOf(
-        MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).typeId, LocalDateTime.of(2024, 12, 1, 0,0)),
-        MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).typeId, LocalDateTime.of(2024, 12, 2,0,0)),
-        MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).typeId, LocalDateTime.of(2024, 12, 3,0,0)),
-        MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).typeId, LocalDateTime.of(2024, 12, 4,0,0)),
-        MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).typeId, LocalDateTime.of(2024, 12, 5,0,0)),
-        MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).typeId, LocalDateTime.of(2024, 12, 6,0,0)),
-    )
+
+    var moodsInCalendar by remember { mutableStateOf<List<MoodHistory>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+         moodsInCalendar = moodViewModel.getMoodDateAndTypeFromUserId()
+    }
 
 
     val currentMonth = YearMonth.now()
@@ -183,7 +181,7 @@ fun MoodCalendar(moodViewModel: MoodViewModel) {
         contentPadding = PaddingValues(8.dp)
     ) {
         items(datesInMonth) { date ->
-            moodType.value = sampleMoodLogs.find { it.dateLogged.toLocalDate() == date }?.userMoodId?.let { moodId ->
+            moodType.value = moodsInCalendar?.find { it.dateLogged.toLocalDate() == date }?.userMoodId?.let { moodId ->
                 MoodTypeEnum.entries.find { it.id == moodId }
             }
             MoodDayItem(date, moodType.value)

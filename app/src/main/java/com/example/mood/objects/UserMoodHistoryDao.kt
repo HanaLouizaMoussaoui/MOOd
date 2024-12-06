@@ -20,5 +20,5 @@ interface UserMoodHistoryDao {
     suspend fun delete(userMoodHistory: MoodHistory)
 
     @Query("SELECT * FROM user_mood_history WHERE userId = :userId")
-    suspend fun getUserMoodHistoryByUserId(userId: Int): MoodHistory
+    suspend fun getUserMoodHistoryByUserId(userId: Int): List<MoodHistory>
 }

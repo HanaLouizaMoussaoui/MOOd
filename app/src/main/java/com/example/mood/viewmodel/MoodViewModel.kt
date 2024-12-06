@@ -150,6 +150,27 @@ class MoodViewModel(
     private suspend fun addToUserHistory(userMoodHistory: MoodHistory) {
         userMoodHistoryRepository.insert(userMoodHistory)
     }
+
+
+    suspend fun getMoodDateAndTypeFromUserId(): List<MoodHistory> {
+        val userId = currentUser.value?.id ?: return emptyList()
+        val moodHistory = getMoodHistoryFromUserId(userId).toMutableList()
+        for (history in moodHistory) {
+            val userMood = getUserMoodFromMoodId(history.userMoodId)
+            history.userMoodId = userMood.typeId
+        }
+        return moodHistory.toList()
+    }
+
+    private suspend fun getMoodHistoryFromUserId(userId: Int): List<MoodHistory> {
+        return userMoodHistoryRepository.getUserMoodHistoryByUserId(userId)
+
+    }
+
+    private suspend fun getUserMoodFromMoodId(moodId: Int): UserMood{
+        return userMoodRepository.getUserMoodById(moodId)
+
+    }
 }
 
 class MoodViewModelFactory(
