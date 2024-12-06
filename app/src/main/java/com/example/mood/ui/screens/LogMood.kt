@@ -164,12 +164,12 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
 @Composable
 fun MoodCalendar(moodViewModel: MoodViewModel) {
     val sampleMoodLogs = listOf(
-        MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 1, 0,0)),
-        MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).id, LocalDateTime.of(2024, 12, 2,0,0)),
-        MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).id, LocalDateTime.of(2024, 12, 3,0,0)),
-        MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).id, LocalDateTime.of(2024, 12, 4,0,0)),
-        MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 5,0,0)),
-        MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).id, LocalDateTime.of(2024, 12, 6,0,0)),
+        MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).typeId, LocalDateTime.of(2024, 12, 1, 0,0)),
+        MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).typeId, LocalDateTime.of(2024, 12, 2,0,0)),
+        MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).typeId, LocalDateTime.of(2024, 12, 3,0,0)),
+        MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).typeId, LocalDateTime.of(2024, 12, 4,0,0)),
+        MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).typeId, LocalDateTime.of(2024, 12, 5,0,0)),
+        MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).typeId, LocalDateTime.of(2024, 12, 6,0,0)),
     )
 
 
