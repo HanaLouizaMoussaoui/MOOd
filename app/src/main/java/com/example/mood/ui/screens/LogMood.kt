@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -112,16 +114,6 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
             onMoodTypeSelected = { selectedMood = it }
         )
 
-        // DEBUGGING: displays selected mood
-        if (selectedMood != null) {
-            Text(
-                text = "You selected: ${selectedMood!!.mood}",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 16.dp),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-
         OutlinedTextField(
             value = thoughts,
             onValueChange = { thoughts = it },
@@ -155,9 +147,10 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
         Text(
             text = "Your mood history:",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(10.dp),
             color = MaterialTheme.colorScheme.onSurface
         )
+        MoodLegend()
         MoodCalendar(moodViewModel)
     }
 }
@@ -201,6 +194,9 @@ fun MoodDayItem(date: LocalDate, mood: MoodTypeEnum?) {
         MoodTypeEnum.NEUTRAL -> Color.Gray
         MoodTypeEnum.ANGRY -> Color.Red
         MoodTypeEnum.ANXIOUS-> Color.Yellow
+        MoodTypeEnum.CALM-> Color.LightGray
+        MoodTypeEnum.EXCITED-> Color.Cyan
+        MoodTypeEnum.CONFUSED-> Color.Magenta
         else -> MaterialTheme.colorScheme.tertiary
     }
 
@@ -218,6 +214,8 @@ fun MoodDayItem(date: LocalDate, mood: MoodTypeEnum?) {
         )
     }
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -260,3 +258,49 @@ fun MoodTypeDropdown(
         }
     }
 }
+@Composable
+fun MoodLegend() {
+    val moods = listOf(
+        MoodTypeEnum.HAPPY to Color.Green,
+        MoodTypeEnum.SAD to Color.Blue,
+        MoodTypeEnum.NEUTRAL to Color.Gray,
+        MoodTypeEnum.ANGRY to Color.Red,
+        MoodTypeEnum.ANXIOUS to Color.Yellow,
+        MoodTypeEnum.CALM to Color.LightGray,
+        MoodTypeEnum.EXCITED to Color.Cyan,
+        MoodTypeEnum.CONFUSED to Color.Magenta
+    )
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
+        items(moods.size) { index ->
+            val (mood, color) = moods[index]
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .background(color, shape = CircleShape)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = mood.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
