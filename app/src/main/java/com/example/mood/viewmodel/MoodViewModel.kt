@@ -27,6 +27,15 @@ class MoodViewModel(
     private val userMoodHistoryRepository: UserMoodHistoryRepository,
     private val moodTypeRepository: MoodTypeRepository
 ) : ViewModel() {
+    private val defaultThoughts = listOf("Today was a great day, a few things happened that made me smile. How can I keep this mood up?",
+        "I'm feeling a bit down today, I think it's because of the weather. How can I cheer myself up? What resources would you recommend",
+        "I find myself feeling angry today for seemingly no reason. How can I relax a little and change perspective?",
+        "I'm feeling a bit anxious today, I think it's because of the upcoming deadline. How can I calm myself down? What resources woudl you recommend?",
+        "I'm feeling very excited today, I think it's because of the good news I received. How can I keep this excitement going?",
+        "I feel very mellow and relaxed today. How can I keep this feeling going?",
+        "I feel a little confused, like I have a brain fog today. How can I clear my mind?",
+        "I feel pretty neutral today, like I don't feel much of anything. How can I change that?",)
+
     //variables for user:
     private val _currentUser = MutableStateFlow<User?>(null)  // Track logged-in user
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
