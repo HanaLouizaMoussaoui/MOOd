@@ -1,18 +1,17 @@
 package com.example.mood.viewmodel
 
 import androidx.lifecycle.ViewModel
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.mood.data.repositories.MoodTypeRepository
 import com.example.mood.data.repositories.UserMoodHistoryRepository
 import com.example.mood.data.repositories.UserMoodRepository
 import com.example.mood.data.repositories.UserRepository
-import com.example.mood.model.MoodType
+import com.example.mood.model.MoodHistory
 import com.example.mood.model.User
+import com.example.mood.model.UserMood
 import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.UiState
-import com.google.ai.client.generativeai.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import kotlinx.coroutines.Dispatchers
@@ -119,6 +118,28 @@ class MoodViewModel(
 
     suspend fun checkMoodTypeExists(moodTypeName: String): Boolean {
         return moodTypeRepository.getMoodTypeByName(moodTypeName) != null
+    }
+
+    suspend fun logMood(selectedMood: MoodTypeEnum, thoughts: String) {
+        val currentUser = _currentUser.value
+        if (currentUser != null) {
+            val currentTime = LocalDateTime.now()
+            val userMood = UserMood(
+                typeId = selectedMood.id,
+                entry = thoughts,
+            )
+            userMoodRepository.insert(userMood)
+            val userMoodHistory = MoodHistory(
+                userId = currentUser.id,
+                userMoodId = userMood.id,
+                dateLogged = currentTime
+            )
+            addToUserHistory(userMoodHistory)
+        }
+    }
+
+    private suspend fun addToUserHistory(userMoodHistory: MoodHistory) {
+        userMoodHistoryRepository.insert(userMoodHistory)
     }
 }
 

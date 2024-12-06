@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +37,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.mood.localNavController
 import com.example.mood.model.MoodHistory
-import com.example.mood.model.MoodType
 import com.example.mood.model.UserMood
 import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.viewmodel.MoodViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -84,6 +84,7 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
     var selectedMood by remember { mutableStateOf<MoodTypeEnum?>(null) }
     var thoughts by remember { mutableStateOf("") }
     var moodTypesEnums by remember { mutableStateOf<List<MoodTypeEnum>>(emptyList()) }
+    val rememberCoroutineScope = rememberCoroutineScope()
 
 
     LaunchedEffect(Unit) {
@@ -113,7 +114,7 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
         // DEBUGGING: displays selected mood
         if (selectedMood != null) {
             Text(
-                text = "You selected: $selectedMood",
+                text = "You selected: ${selectedMood!!.mood}",
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(top = 16.dp),
                 color = MaterialTheme.colorScheme.onSurface
@@ -133,7 +134,11 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
         // Submit Button
         Button(
             onClick = {
-                println("Mood: $selectedMood, Thoughts: $thoughts")
+                if (selectedMood != null) {
+                    rememberCoroutineScope.launch {
+                        moodViewModel.logMood(selectedMood!!, thoughts)
+                    }
+                }
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor =  MaterialTheme.colorScheme.primary,
@@ -154,22 +159,6 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
         MoodCalendar(moodViewModel)
     }
 }
-
-@Composable
-fun MoodButton(mood: String, isSelected: Boolean, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
-            contentColor = Color.Black
-        ),
-        shape = CircleShape,
-        modifier = Modifier.padding(1.dp)
-    ) {
-        Text(text = mood, style = MaterialTheme.typography.bodySmall)
-    }
-}
-
 
 @SuppressLint("NewApi")
 @Composable
