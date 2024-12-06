@@ -14,7 +14,7 @@ import com.example.mood.objects.UserMoodDao
 import com.example.mood.objects.UserMoodHistoryDao
 
 object DatabaseProvider {
-    @Database(entities = [User::class, MoodType::class, MoodHistory::class, UserMood::class], version = 4, exportSchema = false)
+    @Database(entities = [User::class, MoodType::class, MoodHistory::class, UserMood::class], version = 5, exportSchema = false)
     abstract class AppDatabase : RoomDatabase() {
         abstract fun userDao(): UserDao
         abstract fun moodTypeDao(): MoodTypeDao

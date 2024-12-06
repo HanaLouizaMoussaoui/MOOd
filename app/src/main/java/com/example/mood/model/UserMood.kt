@@ -10,10 +10,17 @@ import androidx.room.ForeignKey
         parentColumns = ["id"],
         childColumns = ["typeId"],
         onDelete = ForeignKey.CASCADE
+    ),
+    ForeignKey(
+        entity = User::class,
+        parentColumns = ["id"],
+        childColumns = ["userId"],
+        onDelete = ForeignKey.CASCADE
     )]
 )
 data class UserMood(
-    @PrimaryKey(autoGenerate = true)val id: Int = 1,
+    @PrimaryKey(autoGenerate = true)val id: Int = 0,
     val entry: String?,
     val typeId: Int,
+    val userId: Int
 )

@@ -85,6 +85,7 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
     var thoughts by remember { mutableStateOf("") }
     var moodTypesEnums by remember { mutableStateOf<List<MoodTypeEnum>>(emptyList()) }
     val rememberCoroutineScope = rememberCoroutineScope()
+    val navController = localNavController.current
 
 
     LaunchedEffect(Unit) {
@@ -136,6 +137,7 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
             onClick = {
                 if (selectedMood != null) {
                     rememberCoroutineScope.launch {
+                        navController.navigate("HomeScreen")
                         moodViewModel.logMood(selectedMood!!, thoughts)
                     }
                 }

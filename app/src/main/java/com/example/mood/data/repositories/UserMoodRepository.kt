@@ -20,4 +20,8 @@ class UserMoodRepository(private val userMoodDao: UserMoodDao) : UserMoodDao {
         return userMoodDao.getUserMoodById(userMoodId)
     }
 
+    override suspend fun getUserMoodByUserId(userId: Int): UserMood {
+        return userMoodDao.getUserMoodByUserId(userId)
+    }
+
 }

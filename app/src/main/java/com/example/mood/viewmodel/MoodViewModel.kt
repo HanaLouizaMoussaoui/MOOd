@@ -129,21 +129,38 @@ class MoodViewModel(
         return moodTypeRepository.getMoodTypeByName(moodTypeName) != null
     }
 
-    suspend fun logMood(selectedMood: MoodTypeEnum, thoughts: String) {
+    suspend fun logMood(selectedMood: MoodTypeEnum, thoughts: String?) {
         val currentUser = _currentUser.value
         if (currentUser != null) {
             val currentTime = LocalDateTime.now()
+            val defaultThoughtMap = mapOf(
+                MoodTypeEnum.HAPPY.id to defaultThoughts[0],
+                MoodTypeEnum.SAD.id to defaultThoughts[1],
+                MoodTypeEnum.ANGRY.id to defaultThoughts[2],
+                MoodTypeEnum.ANXIOUS.id to defaultThoughts[3],
+                MoodTypeEnum.EXCITED.id to defaultThoughts[4],
+                MoodTypeEnum.CALM.id to defaultThoughts[5],
+                MoodTypeEnum.CONFUSED.id to defaultThoughts[6],
+                MoodTypeEnum.NEUTRAL.id to defaultThoughts[7]
+            )
             val userMood = UserMood(
                 typeId = selectedMood.id,
                 entry = thoughts,
+                userId = currentUser.id
             )
             userMoodRepository.insert(userMood)
+
+            val insertedMood = userMoodRepository.getUserMoodByUserId(currentUser.id)
             val userMoodHistory = MoodHistory(
                 userId = currentUser.id,
-                userMoodId = userMood.id,
+                userMoodId = insertedMood.id,
                 dateLogged = currentTime
             )
             addToUserHistory(userMoodHistory)
+
+            val finalThoughts = thoughts ?: defaultThoughtMap[selectedMood.id]
+            val prompt = "Today I'm feeling ${selectedMood.mood}. $finalThoughts"
+            sendPrompt(prompt)
         }
     }
 

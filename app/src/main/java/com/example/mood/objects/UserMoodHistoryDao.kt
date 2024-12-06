@@ -10,7 +10,7 @@ import com.example.mood.model.MoodHistory
 
 @Dao
 interface UserMoodHistoryDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insert(userMoodHistory: MoodHistory)
 
     @Update
