@@ -40,7 +40,7 @@ import java.text.SimpleDateFormat
 fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, onThemeSelected: (String) -> Unit) {
     val navController = localNavController.current
     if (moodViewModel.currentUser.collectAsState().value == null) {
-        navController.navigate("Login")
+        navController.navigate("LoginScreenRoute")
     }
     Box(
         modifier = Modifier.fillMaxSize()
