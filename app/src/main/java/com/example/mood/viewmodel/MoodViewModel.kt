@@ -102,7 +102,8 @@ class MoodViewModel(
 
     suspend fun createUser(username:String, email: String, password:String) {
         val currentTime = LocalDateTime.now()
-        val user = User(name = username, email = email, password = password, createdAt = currentTime, editedAt = currentTime, profilePicture = "")
+        val user = User(name = username, email = email, password = password, createdAt = currentTime, editedAt = currentTime,
+            profilePicture = "", colourTheme = "")
         userRepository.insert(user)
     }
 

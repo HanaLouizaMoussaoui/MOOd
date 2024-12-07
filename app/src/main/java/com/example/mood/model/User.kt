@@ -10,11 +10,12 @@ import java.time.LocalDateTime
 @TypeConverters(LocalDateTimeConverter::class)
 data class User(
     @PrimaryKey(autoGenerate = true)val id: Int = 0,
-    val name: String,
-    val email: String,
-    val password: String,
+    var name: String,
+    var email: String,
+    var password: String,
     val createdAt: LocalDateTime,
-    val editedAt: LocalDateTime,
-    val profilePicture: String?,
+    var editedAt: LocalDateTime,
+    var profilePicture: String?,
+    var colourTheme: String?
 )
 

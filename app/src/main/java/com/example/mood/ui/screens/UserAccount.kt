@@ -18,10 +18,12 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +35,10 @@ import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.viewmodel.MoodViewModel
 import com.example.mood.localNavController
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import com.example.mood.model.MoodHistory
+import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -66,7 +71,10 @@ fun UserAccountScreen(contentPadding: PaddingValues, moodViewModel: MoodViewMode
 
 @Composable
 fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel) {
+    val coroutineScope = rememberCoroutineScope()
     val user =  moodViewModel.currentUser.collectAsState().value
+    var moodHistory by remember { mutableStateOf(emptyList<MoodHistory>()) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,7 +83,7 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
         verticalArrangement = Arrangement.Center
     ) {
         if (user != null) {
-            val dateFormatter = SimpleDateFormat("dd-MM-yyyy")
+            val dateTimeFmt = DateTimeFormatter.ofPattern("MMMM dd, yyyy HH:mm")
 
             Icon(
                 painter = painterResource(id = com.example.mood.R.drawable.user),
@@ -123,8 +131,16 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            LaunchedEffect(Unit) {
+                coroutineScope.launch {
+                    moodHistory = moodViewModel.getMoodHistoryFromUserId(user.id)
+                    moodHistory.sortedByDescending { it.dateLogged }
+
+                }
+            }
+
             OutlinedTextField(
-                value = "October 30th 2024",
+                value = moodHistory.firstOrNull()?.dateLogged?.let { dateTimeFmt.format(it) } ?: "No Mood Entries",
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("First Mood Entry") },
@@ -134,7 +150,7 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = "November 28th 2024",
+                value = moodHistory.lastOrNull()?.dateLogged?.let { dateTimeFmt.format(it) } ?: "No Mood Entries",
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Latest Mood Entry") },
