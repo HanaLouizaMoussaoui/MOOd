@@ -49,8 +49,11 @@ class MoodViewModel(
     val uiState: StateFlow<UiState> =
         _uiState.asStateFlow()
 
-    private val _results = MutableStateFlow<List<ResultItem>>(emptyList())
-    val results: StateFlow<List<ResultItem>> = _results.asStateFlow()
+    private val _result = MutableStateFlow("")
+    val result: StateFlow<String> = _result.asStateFlow()
+
+    private val _currentPrompt = MutableStateFlow("Your messages appear here.")
+    val currentPrompt: StateFlow<String> = _currentPrompt.asStateFlow()
 
     private val generativeModel = GenerativeModel(
         modelName = "gemini-1.5-flash",
@@ -58,38 +61,25 @@ class MoodViewModel(
     )
 
     fun sendPrompt(prompt: String) {
-        _results.value += ResultItem(prompt = prompt, isLoading = true)
+        _result.value = ResultItem(prompt = prompt, isLoading = true).toString()
         _uiState.value = UiState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = generativeModel.generateContent(
                     content {
-                        text(prompt)
+                        text("The user said: " + prompt + " You are MOOd, a personal wellness assistant. Please answer in a kindly and friendly" +
+                                "manner, as if you are friends. Please answer in plain text, with no markdown.")
                     }
                 )
-                response.text?.let { outputContent ->
-                    _uiState.value = UiState.Success(outputContent)
-
-                    val updatedResults = _results.value.map {
-                        if (it.prompt == prompt) it.copy(isLoading = false, result = outputContent)
-                        else it
-                    }
-                    _results.value = updatedResults
-                } ?: run {
-                    val updatedResults = _results.value.map {
-                        if (it.prompt == prompt) it.copy(isLoading = false, result = "The AI response was empty.")
-                        else it
-                    }
-                    _results.value = updatedResults
-                }
+                _currentPrompt.value = prompt
+                val outputContent = response.text ?: "The AI response was empty."
+                _result.value = ResultItem(prompt = prompt, result = outputContent, isLoading = false).toString()
+                _uiState.value = UiState.Success(outputContent)
 
             } catch (e: Exception) {
-                val updatedResults = _results.value.map {
-                    if (it.prompt == prompt) it.copy(isLoading = false, result = "Error: ${e.localizedMessage ?: "Unknown error"}")
-                    else it
-                }
-                _results.value = updatedResults
-                _uiState.value = UiState.Error(e.localizedMessage ?: "")
+                val errorMessage = "Error: ${e.localizedMessage ?: "Unknown error"}"
+                _result.value = ResultItem(prompt = prompt, result = errorMessage, isLoading = false ).toString()
+                _uiState.value = UiState.Error(errorMessage)
             }
         }
     }
@@ -106,7 +96,7 @@ class MoodViewModel(
     suspend fun createUser(username:String, email: String, password:String) {
         val currentTime = LocalDateTime.now()
         val user = User(name = username, email = email, password = password, createdAt = currentTime, editedAt = currentTime,
-            profilePicture = "", colourTheme = "")
+            profilePicture = "", colourTheme = "Default")
         userRepository.insert(user)
     }
 
@@ -121,6 +111,25 @@ class MoodViewModel(
         } else {
             null
         }
+    }
+
+    suspend fun updateUserInfo(user: User, name: String, email: String, password: String, theme: String){
+        try {
+            val currentTime = LocalDateTime.now()
+            val updatedUser = User(
+                id = user.id,
+                name = name,
+                email = email,
+                password = password,
+                createdAt = user.createdAt,
+                editedAt = currentTime,
+                profilePicture = user.profilePicture,
+                colourTheme = theme
+                )
+            userRepository.update(updatedUser)
+        }
+        catch (_: Exception){}
+
     }
 
     suspend fun getAllMoodTypes(): List<MoodTypeEnum> {
@@ -165,7 +174,8 @@ class MoodViewModel(
             addToUserHistory(userMoodHistory)
 
             val finalThoughts = thoughts ?: defaultThoughtMap[selectedMood.id]
-            val prompt = "Today I'm feeling ${selectedMood.mood}. $finalThoughts"
+            val prompt = "I'm feeling ${selectedMood.mood}. $finalThoughts"
+            _currentPrompt.value = prompt
             sendPrompt(prompt)
         }
     }

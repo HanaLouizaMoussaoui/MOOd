@@ -34,9 +34,7 @@ import com.example.mood.localNavController
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
 import com.example.mood.viewmodel.MoodViewModel
-import com.example.mood.localNavController
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import com.example.mood.model.MoodHistory
 import java.time.format.DateTimeFormatter
 
@@ -75,6 +73,13 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
     val user =  moodViewModel.currentUser.collectAsState().value
     var moodHistory by remember { mutableStateOf(emptyList<MoodHistory>()) }
 
+    // Edit-able fields for the user
+    var isEditing by remember { mutableStateOf(false) }
+    var editableName by remember { mutableStateOf(user?.name ?: "") }
+    var editableEmail by remember { mutableStateOf(user?.email ?: "") }
+    var editablePassword by remember { mutableStateOf(user?.password ?: "") }
+    var editableTheme by remember { mutableStateOf(user?.colourTheme ?: "Light") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -92,38 +97,62 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
                 modifier = Modifier.size(100.dp)
             )
 
-            Text(
-                text = user.name,
-                style = MaterialTheme.typography.displayMedium,
+            OutlinedTextField(
+                value = editableName,
+                onValueChange = { editableName = it },
+                label = {Text ("Name")},
                 modifier = Modifier.padding(bottom = 24.dp),
-                color = MaterialTheme.colorScheme.primary
+                enabled = isEditing,
             )
 
-            Text(
-                text = user.email,
-                style = MaterialTheme.typography.bodyLarge,
+            OutlinedTextField(
+                value = editableEmail,
+                onValueChange = { editableEmail = it },
+                label = {Text ("Email")},
+                enabled = isEditing,
                 modifier = Modifier.padding(bottom = 24.dp),
-                color = MaterialTheme.colorScheme.onSurface
             )
 
-            Text(
-                text = "Theme",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            SelectionBar(onThemeSelected)
+            if (isEditing) {
+                Text("Select Theme")
+                SelectionBar(
+                    selectedTheme = editableTheme,
+                    onThemeSelected = { theme ->
+                        editableTheme = theme
+                    }
+                )
+            } else {
+                Text(if (editableTheme != "") "Current theme: $editableTheme" else "Current theme: Default")
+            }
 
             Button(
-                onClick = { /* Handle Edit */ },
-                modifier = Modifier.fillMaxWidth()
+                onClick = {
+                    if (isEditing) {
+                        coroutineScope.launch {
+                            // Save changes
+                            moodViewModel.updateUserInfo(
+                                user,
+                                editableName,
+                                editableEmail,
+                                editablePassword,
+                                editableTheme
+                            )
+                        }
+                }
+                    // Toggle edit mode
+                    isEditing = !isEditing },
+                modifier = Modifier.fillMaxWidth(),
+                // making sure the user has entered a proper name and email
+                enabled = editableName.isNotEmpty() && editableEmail.isNotEmpty() && editablePassword.isNotEmpty()
             ) {
-                Text("Edit")
+                Text(if (isEditing) "Save Changes" else "Edit")
             }
 
             // Password TextField
             OutlinedTextField(
-                value = user.password,
-                onValueChange = {},
-                readOnly = true,
+                value = editablePassword,
+                onValueChange = {editablePassword = it},
+                enabled = isEditing,
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation()
@@ -142,7 +171,7 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
             OutlinedTextField(
                 value = moodHistory.firstOrNull()?.dateLogged?.let { dateTimeFmt.format(it) } ?: "No Mood Entries",
                 onValueChange = {},
-                readOnly = true,
+                enabled = false,
                 label = { Text("First Mood Entry") },
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -152,7 +181,7 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
             OutlinedTextField(
                 value = moodHistory.lastOrNull()?.dateLogged?.let { dateTimeFmt.format(it) } ?: "No Mood Entries",
                 onValueChange = {},
-                readOnly = true,
+                enabled = false,
                 label = { Text("Latest Mood Entry") },
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -162,20 +191,12 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
             OutlinedTextField(
                 value = user.editedAt.toString(),
                 onValueChange = {},
-                readOnly = true,
+                enabled = false,
                 label = { Text("Last Edited") },
                 modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = user.createdAt.toString(),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Created At") },
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
         else {
             Text("No user data found. Please exit and login.")
@@ -184,9 +205,11 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
 }
 
 @Composable
-fun SelectionBar(onThemeSelected: (String) -> Unit) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
+fun SelectionBar(selectedTheme: String, onThemeSelected: (String) -> Unit) {
     val tabs = listOf("Light", "Default", "Dark")
+    var selectedTabIndex = remember(selectedTheme) {
+        tabs.indexOf(selectedTheme).takeIf { it >= 0 } ?: 1
+    }
 
     TabRow(
         selectedTabIndex = selectedTabIndex,

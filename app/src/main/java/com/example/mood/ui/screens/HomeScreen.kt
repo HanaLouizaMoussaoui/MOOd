@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
@@ -30,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,6 +47,7 @@ import com.example.mood.model.UserMood
 import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
+import com.example.mood.ui.UiState
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 import kotlinx.coroutines.launch
@@ -130,53 +136,70 @@ fun MoodChat(moodViewModel: MoodViewModel){
 
 @Composable
 fun AIPromptBox(moodViewModel: MoodViewModel) {
-    val placeholderPrompt = stringResource(R.string.prompt_placeholder)
-    val placeholderResult = stringResource(R.string.results_placeholder)
+    val placeholderPrompt = ""
+    //val placeholderResult = stringResource(R.string.results_placeholder)
     var prompt by rememberSaveable { mutableStateOf(placeholderPrompt) }
-    var result by rememberSaveable { mutableStateOf(placeholderResult) }
-    val results by moodViewModel.results.collectAsState()
+    //var result by rememberSaveable { mutableStateOf(placeholderResult) }
+    //val results by moodViewModel.results.collectAsState()
     val uiState by moodViewModel.uiState.collectAsState()
+    val currentPrompt by moodViewModel.currentPrompt.collectAsState()
 
     Column(modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
 
     ){
-        LazyColumn {
-            items(results) { resultItem ->
-                Column(modifier = Modifier.padding(bottom = 8.dp)) {
-                    TextField(
-                        value = resultItem.result
-                            ?: if (resultItem.isLoading) "Thinking..." else "No response",
-                        onValueChange = {},
-                        enabled = false, // Make result fields read-only
-                        label = { Text("Result for: ${resultItem.prompt}") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
         Row(
-            modifier = Modifier.padding(all = 16.dp)
-        ) {
-            TextField(
-                value = prompt,
-                onValueChange = { prompt = it },
-                modifier = Modifier
-                    .weight(0.8f)
-                    .padding(end = 16.dp)
-                    .align(Alignment.CenterVertically)
-            )
+        modifier = Modifier.padding(all = 16.dp)
+    ) {
+        TextField(
+            value = prompt,
+            onValueChange = { prompt = it },
+            label = { Text("Your message:") },
+            modifier = Modifier
+                .weight(0.8f)
+                .padding(end = 16.dp)
+                .align(Alignment.CenterVertically)
+        )
 
-            Button(
-                onClick = {
-                    moodViewModel.sendPrompt(prompt)
+        Button(
+            onClick = {
+                moodViewModel.sendPrompt(prompt)
+            },
+            enabled = prompt.isNotEmpty(),
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+        ) {
+            Text(text = "Send")
+        }
+    }
+        Box( modifier = Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(16.dp)
+        ){
+            Text(text = currentPrompt ,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+        ){
+            Text(
+                text = when (uiState) {
+                    is UiState.Loading -> "Thinking..."
+                    is UiState.Error -> (uiState as UiState.Error).errorMessage
+                    is UiState.Success -> (uiState as UiState.Success).outputText
+                    else -> stringResource(R.string.results_placeholder)
                 },
-                enabled = prompt.isNotEmpty(),
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-            ) {
-                Text(text = "Send")
-            }
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer)
         }
     }
 }
