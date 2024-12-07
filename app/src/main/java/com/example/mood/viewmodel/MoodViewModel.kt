@@ -180,7 +180,7 @@ class MoodViewModel(
         return moodHistory.toList()
     }
 
-    private suspend fun getMoodHistoryFromUserId(userId: Int): List<MoodHistory> {
+     suspend fun getMoodHistoryFromUserId(userId: Int): List<MoodHistory> {
         return userMoodHistoryRepository.getUserMoodHistoryByUserId(userId)
 
     }
