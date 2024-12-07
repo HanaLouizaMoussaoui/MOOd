@@ -24,4 +24,9 @@ class UserMoodRepository(private val userMoodDao: UserMoodDao) : UserMoodDao {
         return userMoodDao.getUserMoodByUserId(userId)
     }
 
+    override suspend fun getMostRecentUserMood(userId: Int): UserMood {
+        return userMoodDao.getMostRecentUserMood(userId)
+    }
+
+
 }

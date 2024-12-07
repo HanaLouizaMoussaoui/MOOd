@@ -40,6 +40,9 @@ class MoodViewModel(
     private val _currentUser = MutableStateFlow<User?>(null)  // Track logged-in user
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
+    private val _moodHistory = MutableStateFlow<List<MoodHistory>>(emptyList())
+    val moodHistory: StateFlow<List<MoodHistory>> = _moodHistory.asStateFlow()
+
     // variables for AI:
     private val _uiState: MutableStateFlow<UiState> =
         MutableStateFlow(UiState.Initial)
@@ -113,6 +116,7 @@ class MoodViewModel(
         // making sure the password matches
         return if (user != null && password == user.password){
             _currentUser.value = user
+            _moodHistory.value = getMoodHistoryFromUserId(user.id)
             user
         } else {
             null
@@ -147,11 +151,12 @@ class MoodViewModel(
             val userMood = UserMood(
                 typeId = selectedMood.id,
                 entry = thoughts,
-                userId = currentUser.id
+                userId = currentUser.id,
+                dateLogged = currentTime
             )
             userMoodRepository.insert(userMood)
 
-            val insertedMood = userMoodRepository.getUserMoodByUserId(currentUser.id)
+            val insertedMood = userMoodRepository.getMostRecentUserMood(currentUser.id)
             val userMoodHistory = MoodHistory(
                 userId = currentUser.id,
                 userMoodId = insertedMood.id,
@@ -170,6 +175,7 @@ class MoodViewModel(
     }
 
 
+
     suspend fun getMoodDateAndTypeFromUserId(): List<MoodHistory> {
         val userId = currentUser.value?.id ?: return emptyList()
         val moodHistory = getMoodHistoryFromUserId(userId).toMutableList()
@@ -185,7 +191,7 @@ class MoodViewModel(
 
     }
 
-    private suspend fun getUserMoodFromMoodId(moodId: Int): UserMood{
+    suspend fun getUserMoodFromMoodId(moodId: Int): UserMood{
         return userMoodRepository.getUserMoodById(moodId)
 
     }

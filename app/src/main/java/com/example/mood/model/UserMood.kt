@@ -3,6 +3,9 @@ package com.example.mood.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
+import androidx.room.TypeConverters
+import com.example.mood.converters.LocalDateTimeConverter
+import java.time.LocalDateTime
 
 @Entity(tableName = "user_mood",
     foreignKeys = [ForeignKey(
@@ -18,9 +21,12 @@ import androidx.room.ForeignKey
         onDelete = ForeignKey.CASCADE
     )]
 )
+
+@TypeConverters(LocalDateTimeConverter::class)
 data class UserMood(
     @PrimaryKey(autoGenerate = true)val id: Int = 0,
     val entry: String?,
     val typeId: Int,
-    val userId: Int
+    val userId: Int,
+    val dateLogged: LocalDateTime
 )

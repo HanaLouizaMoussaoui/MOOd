@@ -24,4 +24,7 @@ interface UserMoodDao {
 
     @Query("SELECT * FROM user_mood WHERE userId = :userId")
     suspend fun getUserMoodByUserId(userId: Int): UserMood
+
+    @Query("SELECT * FROM user_mood WHERE userId = :userId ORDER BY dateLogged DESC LIMIT 1")
+    suspend fun getMostRecentUserMood(userId: Int): UserMood
 }
