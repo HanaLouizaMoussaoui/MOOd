@@ -93,6 +93,8 @@ fun HomeScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel) {
                 onLogClick = { navController.navigate("LogMood") }
             )
 
+            Spacer(modifier = Modifier.padding(16.dp))
+
             if (user != null){
                 WelcomeBox(user)
             }
@@ -144,7 +146,7 @@ fun AIPromptBox(moodViewModel: MoodViewModel) {
     val uiState by moodViewModel.uiState.collectAsState()
     val currentPrompt by moodViewModel.currentPrompt.collectAsState()
 
-    Column(modifier = Modifier,
+    Column(modifier = Modifier.height(275.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
 
     ){
@@ -190,6 +192,7 @@ fun AIPromptBox(moodViewModel: MoodViewModel) {
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
+
         ){
             Text(
                 text = when (uiState) {
