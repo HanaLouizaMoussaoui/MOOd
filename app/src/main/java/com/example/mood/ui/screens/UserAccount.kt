@@ -191,7 +191,7 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = user.editedAt.toString(),
+                value = user.editedAt.let { dateTimeFmt.format(it) } ?: "No Edits Yet",
                 onValueChange = {},
                 enabled = false,
                 label = { Text("Last Edited") },
