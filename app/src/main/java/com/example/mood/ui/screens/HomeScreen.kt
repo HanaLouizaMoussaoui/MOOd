@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -106,7 +107,7 @@ fun HomeScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel) {
             if (moodHistory.isNotEmpty()) {
                 MoodHistoryTable(moodHistory, userMoods, dateTimeFmt, moodViewModel)
             } else {
-                Text("No Mood Entries")
+                Text("No Mood Entries", color = MaterialTheme.colorScheme.onSurface)
             }
         }
     }
@@ -139,10 +140,7 @@ fun MoodChat(moodViewModel: MoodViewModel){
 @Composable
 fun AIPromptBox(moodViewModel: MoodViewModel) {
     val placeholderPrompt = ""
-    //val placeholderResult = stringResource(R.string.results_placeholder)
     var prompt by rememberSaveable { mutableStateOf(placeholderPrompt) }
-    //var result by rememberSaveable { mutableStateOf(placeholderResult) }
-    //val results by moodViewModel.results.collectAsState()
     val uiState by moodViewModel.uiState.collectAsState()
     val currentPrompt by moodViewModel.currentPrompt.collectAsState()
 
@@ -181,7 +179,8 @@ fun AIPromptBox(moodViewModel: MoodViewModel) {
         ){
             Text(text = currentPrompt ,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer)
+                color = Color.Black
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -216,7 +215,9 @@ fun MoodHistoryTable(moodHistory: List<MoodHistory>, userMoods: Map<Int, UserMoo
     ) {
         Text(modifier =
         Modifier.padding(8.dp)
-            .align(Alignment.CenterHorizontally),text = "Mood History", style = MaterialTheme.typography.headlineLarge)
+            .align(Alignment.CenterHorizontally),text = "Mood History", style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary)
+
 
         moodHistory.forEach { mood ->
             val userMood = userMoods[mood.userMoodId]
@@ -225,9 +226,13 @@ fun MoodHistoryTable(moodHistory: List<MoodHistory>, userMoods: Map<Int, UserMoo
                 modifier = Modifier
                     .padding(8.dp),
             ) {
-                Text(text = "You felt ${moodType?.mood} on ${dateTimeFmt.format(mood.dateLogged)} " +
-                        "at ${timeFormat.format(mood.dateLogged)}", style = MaterialTheme.typography.bodyMedium)}
-
+                Text(
+                    text = "You felt ${moodType?.mood} on ${dateTimeFmt.format(mood.dateLogged)} " +
+                            "at ${timeFormat.format(mood.dateLogged)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
             HorizontalDivider()
         }
     }

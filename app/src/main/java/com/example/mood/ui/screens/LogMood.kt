@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -166,15 +167,20 @@ fun MoodCalendar(moodViewModel: MoodViewModel) {
     }
 
 
+
     val currentMonth = YearMonth.now()
+    val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
     val daysInMonth = currentMonth.lengthOfMonth()
     val datesInMonth = (1..daysInMonth).map { currentMonth.atDay(it) }
     val moodType = remember { mutableStateOf<MoodTypeEnum?>(null) }
+
+    Text(text = currentMonth.format(formatter), color = MaterialTheme.colorScheme.onSurface)
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
         contentPadding = PaddingValues(8.dp)
     ) {
+
         items(datesInMonth) { date ->
             moodType.value = moodsInCalendar?.find { it.dateLogged.toLocalDate() == date }?.userMoodId?.let { moodId ->
                 MoodTypeEnum.entries.find { it.id == moodId }

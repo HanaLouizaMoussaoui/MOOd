@@ -114,7 +114,7 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
             )
 
             if (isEditing) {
-                Text("Select Theme")
+                Text("Select Theme", color = MaterialTheme.colorScheme.onSurface)
                 SelectionBar(
                     selectedTheme = editableTheme,
                     onThemeSelected,
