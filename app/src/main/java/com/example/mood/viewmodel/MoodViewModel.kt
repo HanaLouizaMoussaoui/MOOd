@@ -127,6 +127,7 @@ class MoodViewModel(
                 colourTheme = theme
                 )
             userRepository.update(updatedUser)
+            _currentUser.value = updatedUser
         }
         catch (_: Exception){}
 

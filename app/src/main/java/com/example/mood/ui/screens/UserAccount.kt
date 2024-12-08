@@ -117,12 +117,14 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
                 Text("Select Theme")
                 SelectionBar(
                     selectedTheme = editableTheme,
-                    onThemeSelected = { theme ->
+                    onThemeSelected,
+                    onThemeSelectedDatabase = { theme ->
                         editableTheme = theme
                     }
                 )
             } else {
-                Text(if (editableTheme != "") "Current theme: $editableTheme" else "Current theme: Default")
+                Text(if (editableTheme != "") "Current theme: $editableTheme" else "Current theme: Default", color = MaterialTheme.colorScheme.onSurface)
+
             }
 
             Button(
@@ -205,7 +207,7 @@ fun UserAccount(onThemeSelected: (String) -> Unit, moodViewModel: MoodViewModel)
 }
 
 @Composable
-fun SelectionBar(selectedTheme: String, onThemeSelected: (String) -> Unit) {
+fun SelectionBar(selectedTheme: String, onThemeSelected: (String) -> Unit, onThemeSelectedDatabase: (String) -> Unit) {
     val tabs = listOf("Light", "Default", "Dark")
     var selectedTabIndex = remember(selectedTheme) {
         tabs.indexOf(selectedTheme).takeIf { it >= 0 } ?: 1
@@ -219,7 +221,8 @@ fun SelectionBar(selectedTheme: String, onThemeSelected: (String) -> Unit) {
             Tab(
                 selected = selectedTabIndex == index,
                 onClick = { selectedTabIndex = index
-                    onThemeSelected(title)},
+                    onThemeSelectedDatabase(title)
+                    onThemeSelected(title) },
                 text = { Text(text = title, color= MaterialTheme.colorScheme.onSurface) }
             )
         }

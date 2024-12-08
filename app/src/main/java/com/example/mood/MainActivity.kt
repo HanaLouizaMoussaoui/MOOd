@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -69,13 +70,22 @@ class MainActivity : ComponentActivity() {
         seedDatabase(moodTypeRepository)
         //remove()
         setContent {
-            var selectedTheme by remember { mutableStateOf("Default") }
+
+            val currentUser by moodViewModel.currentUser.collectAsState()
+
+
+            var selectedTheme = currentUser?.colourTheme ?: "Default"
+
 
             MOOdTheme (themeMode = selectedTheme){
 
-                Router(moodViewModel, onThemeSelect = { selectedTheme = it } )
+                Router(moodViewModel, onThemeSelect = { selectedTheme = currentUser?.colourTheme ?: "Default" } )
 
             }
+
+
+
+
         }
     }
 
