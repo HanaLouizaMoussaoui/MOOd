@@ -75,7 +75,9 @@ erDiagram
     UserMood {
 	int mood_id PK
 	string entry
+	date date_logged
 	int type_id FK
+	int user_id FK
     }
 
    MoodHistory {
