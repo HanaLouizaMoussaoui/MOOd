@@ -25,12 +25,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.mood.localNavController
+import com.example.mood.ui.theme.BrightCyan
 import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, navController: NavHostController) {
+fun RegisterScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel ) {
     MOOdTheme {
         Column(
             modifier = Modifier
@@ -38,18 +40,20 @@ fun RegisterScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel, 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top // Align items at the top
         ) {
-            Register(moodViewModel, navController)
+            Register(moodViewModel)
         }
     }
 }
 
 @Composable
-fun Register(moodViewModel: MoodViewModel, navController: NavHostController){
+fun Register(moodViewModel: MoodViewModel){
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+    val navController = localNavController.current
 
     // Sign Up
     Column(
@@ -64,6 +68,16 @@ fun Register(moodViewModel: MoodViewModel, navController: NavHostController){
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(bottom = 24.dp)
         )
+
+        // Username textfield
+        OutlinedTextField(
+            value = username,
+            onValueChange = {username = it},
+            label = { Text("Username") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Email TextField
         OutlinedTextField(
@@ -110,9 +124,9 @@ fun Register(moodViewModel: MoodViewModel, navController: NavHostController){
             onClick = {
                 // attempts to create a new user
                 coroutineScope.launch {
-                    val result = createUser(email, password, confirmPassword, moodViewModel)
+                    val result = createUser(username, email, password, confirmPassword, moodViewModel)
                     if (result.isEmpty()) {
-                        navController.navigate("login") // navigate to the login screen
+                        navController.navigate("LoginScreenRoute") // navigate to the login screen
                     } else {
                         errorMessage = result
                     }
@@ -132,7 +146,7 @@ fun Register(moodViewModel: MoodViewModel, navController: NavHostController){
         },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Cyan, // Background color
+                containerColor = BrightCyan, // Background color
                 contentColor = Color.White  // Text color
             ),) {
             Text("Go Login")
@@ -140,9 +154,9 @@ fun Register(moodViewModel: MoodViewModel, navController: NavHostController){
     }
 }
 
-suspend fun createUser(email: String, password: String, confirmPassword: String, moodViewModel: MoodViewModel): String{
+suspend fun createUser(username: String, email: String, password: String, confirmPassword: String, moodViewModel: MoodViewModel): String{
     // checking for no content
-    if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()){
+    if (username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()){
         return "Fields cannot be empty."
     }
 
@@ -155,7 +169,7 @@ suspend fun createUser(email: String, password: String, confirmPassword: String,
     return if (moodViewModel.checkUserExistsByEmail(email)) {
         "User already exists. Please choose a different email or login."
     } else {
-        moodViewModel.createUser(email, password)
+        moodViewModel.createUser(username, email, password)
         return ""
     }
 }

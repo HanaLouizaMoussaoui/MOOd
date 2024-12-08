@@ -10,7 +10,7 @@ import com.example.mood.model.MoodHistory
 
 @Dao
 interface UserMoodHistoryDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insert(userMoodHistory: MoodHistory)
 
     @Update
@@ -20,5 +20,5 @@ interface UserMoodHistoryDao {
     suspend fun delete(userMoodHistory: MoodHistory)
 
     @Query("SELECT * FROM user_mood_history WHERE userId = :userId")
-    suspend fun getUserMoodHistoryByUserId(userId: Int): MoodHistory
+    suspend fun getUserMoodHistoryByUserId(userId: Int): List<MoodHistory>
 }

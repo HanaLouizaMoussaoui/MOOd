@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,34 +19,41 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.example.mood.localNavController
 import com.example.mood.model.MoodHistory
 import com.example.mood.model.UserMood
 import com.example.mood.model.enums.MoodTypeEnum
 import com.example.mood.ui.NavBar
 import com.example.mood.ui.TopBar
-import com.example.mood.ui.theme.MOOdTheme
 import com.example.mood.viewmodel.MoodViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 
 @Composable
-fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  navController: NavHostController) {
-
+fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel) {
+    val navController = localNavController.current
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -65,28 +73,28 @@ fun LogMoodScreen(contentPadding: PaddingValues, moodViewModel: MoodViewModel,  
             LogMood(moodViewModel)
         }
     }
-    }
-
-
-
-
-
+}
 
 @Composable
 fun LogMood(moodViewModel: MoodViewModel) {
     Column {
         MoodSelectionPage(moodViewModel)
-
     }
 }
 
-
-
 @Composable
 fun MoodSelectionPage(moodViewModel: MoodViewModel) {
-    val moods = listOf("Angry", "Sad", "Happy", "Ecstatic")
-    var selectedMood by remember { mutableStateOf("") }
+    var selectedMood by remember { mutableStateOf<MoodTypeEnum?>(null) }
     var thoughts by remember { mutableStateOf("") }
+    var moodTypesEnums by remember { mutableStateOf<List<MoodTypeEnum>>(emptyList()) }
+    val rememberCoroutineScope = rememberCoroutineScope()
+    val navController = localNavController.current
+
+
+    LaunchedEffect(Unit) {
+        moodTypesEnums = moodViewModel.getAllMoodTypes()
+    }
+
 
     Column(
         modifier = Modifier
@@ -101,28 +109,11 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        // Mood Buttons Row
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            moods.forEach { mood ->
-                MoodButton(
-                    mood = mood,
-                    isSelected = selectedMood == mood,
-                    onClick = { selectedMood = mood }
-                )
-            }
-        }
-
-        // DEBUGGING: displays selected mood
-        if (selectedMood.isNotEmpty()) {
-            Text(
-                text = "You selected: $selectedMood",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 16.dp),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
+        MoodTypeDropdown(
+            moodTypes = moodTypesEnums,
+            selectedMoodType = selectedMood,
+            onMoodTypeSelected = { selectedMood = it }
+        )
 
         OutlinedTextField(
             value = thoughts,
@@ -137,13 +128,17 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
         // Submit Button
         Button(
             onClick = {
-                println("Mood: $selectedMood, Thoughts: $thoughts")
+                if (selectedMood != null) {
+                    rememberCoroutineScope.launch {
+                        navController.navigate("HomeScreen")
+                        moodViewModel.logMood(selectedMood!!, thoughts)
+                    }
+                }
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor =  MaterialTheme.colorScheme.primary,
                 contentColor = Color.Black
             ),
-          //  enabled = selectedMood.isNotEmpty() && thoughts.isNotBlank(), // Only enabled if mood and thoughts are filled
             modifier = Modifier.
             width(150.dp)
         ) {
@@ -153,67 +148,41 @@ fun MoodSelectionPage(moodViewModel: MoodViewModel) {
         Text(
             text = "Your mood history:",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(10.dp),
             color = MaterialTheme.colorScheme.onSurface
         )
+        MoodLegend()
         MoodCalendar(moodViewModel)
-
-
-
-
-
     }
 }
-
-@Composable
-fun MoodButton(mood: String, isSelected: Boolean, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
-            contentColor = Color.Black
-        ),
-        shape = CircleShape,
-        modifier = Modifier.padding(1.dp)
-    ) {
-        Text(text = mood, style = MaterialTheme.typography.bodySmall)
-    }
-}
-
 
 @SuppressLint("NewApi")
 @Composable
 fun MoodCalendar(moodViewModel: MoodViewModel) {
-   // val sampleMoodLogs = listOf(
-   //     MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 1, 0,0)),
-    //    MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).id, LocalDateTime.of(2024, 12, 2,0,0)),
-     //  MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).id, LocalDateTime.of(2024, 12, 3,0,0)),
-    //    MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).id, LocalDateTime.of(2024, 12, 4,0,0)),
-  //      MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 5,0,0)),
-    //    MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).id, LocalDateTime.of(2024, 12, 6,0,0)),
-  //  )
 
-    val sampleMoodLogs = listOf(
-        MoodHistory(1, 1, UserMood(entry = "very nice", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 1, 0,0)),
-        MoodHistory(2, 1, UserMood(entry = "very bad", typeId = MoodTypeEnum.SAD.id).id, LocalDateTime.of(2024, 12, 2,0,0)),
-        MoodHistory(3, 1, UserMood(entry = "neutral", typeId = MoodTypeEnum.NEUTRAL.id).id, LocalDateTime.of(2024, 12, 3,0,0)),
-        MoodHistory(4, 1, UserMood(entry = "very anxious", typeId = MoodTypeEnum.ANXIOUS.id).id, LocalDateTime.of(2024, 12, 4,0,0)),
-        MoodHistory(5, 1, UserMood(entry = "very happy", typeId = MoodTypeEnum.HAPPY.id).id, LocalDateTime.of(2024, 12, 5,0,0)),
-        MoodHistory(6, 1, UserMood(entry = "very angry", typeId = MoodTypeEnum.ANGRY.id).id, LocalDateTime.of(2024, 12, 6,0,0)),
-    )
+    var moodsInCalendar by remember { mutableStateOf<List<MoodHistory>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+         moodsInCalendar = moodViewModel.getMoodDateAndTypeFromUserId()
+    }
+
 
 
     val currentMonth = YearMonth.now()
+    val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
     val daysInMonth = currentMonth.lengthOfMonth()
     val datesInMonth = (1..daysInMonth).map { currentMonth.atDay(it) }
     val moodType = remember { mutableStateOf<MoodTypeEnum?>(null) }
+
+    Text(text = currentMonth.format(formatter), color = MaterialTheme.colorScheme.onSurface)
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
         contentPadding = PaddingValues(8.dp)
     ) {
+
         items(datesInMonth) { date ->
-            moodType.value = sampleMoodLogs.find { it.dateLogged.toLocalDate() == date }?.userMoodId?.let { moodId ->
+            moodType.value = moodsInCalendar?.find { it.dateLogged.toLocalDate() == date }?.userMoodId?.let { moodId ->
                 MoodTypeEnum.entries.find { it.id == moodId }
             }
             MoodDayItem(date, moodType.value)
@@ -231,6 +200,9 @@ fun MoodDayItem(date: LocalDate, mood: MoodTypeEnum?) {
         MoodTypeEnum.NEUTRAL -> Color.Gray
         MoodTypeEnum.ANGRY -> Color.Red
         MoodTypeEnum.ANXIOUS-> Color.Yellow
+        MoodTypeEnum.CALM-> Color.LightGray
+        MoodTypeEnum.EXCITED-> Color.Cyan
+        MoodTypeEnum.CONFUSED-> Color.Magenta
         else -> MaterialTheme.colorScheme.tertiary
     }
 
@@ -247,5 +219,94 @@ fun MoodDayItem(date: LocalDate, mood: MoodTypeEnum?) {
             style = MaterialTheme.typography.bodyLarge
         )
     }
-
 }
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MoodTypeDropdown(
+    moodTypes:  List<MoodTypeEnum>,
+    selectedMoodType: MoodTypeEnum?,
+    onMoodTypeSelected: (MoodTypeEnum) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember { mutableStateOf(selectedMoodType?.mood ?: "Select Mood") }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = selectedText,
+            onValueChange = { },
+            readOnly = true,
+            label = { Text("Mood Type") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier.menuAnchor()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            moodTypes.forEach { moodType ->
+                DropdownMenuItem(
+                    text = { Text(moodType.mood) },
+                    onClick = {
+                        selectedText = moodType.mood
+                        onMoodTypeSelected(moodType)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+@Composable
+fun MoodLegend() {
+    val moods = listOf(
+        MoodTypeEnum.HAPPY to Color.Green,
+        MoodTypeEnum.SAD to Color.Blue,
+        MoodTypeEnum.NEUTRAL to Color.Gray,
+        MoodTypeEnum.ANGRY to Color.Red,
+        MoodTypeEnum.ANXIOUS to Color.Yellow,
+        MoodTypeEnum.CALM to Color.LightGray,
+        MoodTypeEnum.EXCITED to Color.Cyan,
+        MoodTypeEnum.CONFUSED to Color.Magenta
+    )
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
+        items(moods.size) { index ->
+            val (mood, color) = moods[index]
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .background(color, shape = CircleShape)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = mood.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+

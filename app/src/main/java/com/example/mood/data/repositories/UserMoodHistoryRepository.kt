@@ -2,6 +2,7 @@ package com.example.mood.data.repositories
 
 import com.example.mood.objects.UserMoodHistoryDao
 import com.example.mood.model.MoodHistory
+import com.example.mood.model.MoodType
 
 class UserMoodHistoryRepository(private val userMoodHistoryDao: UserMoodHistoryDao) : UserMoodHistoryDao{
     override suspend fun insert(userMoodHistory: MoodHistory) {
@@ -16,7 +17,7 @@ class UserMoodHistoryRepository(private val userMoodHistoryDao: UserMoodHistoryD
         return userMoodHistoryDao.delete(userMoodHistory)
     }
 
-    override suspend fun getUserMoodHistoryByUserId(userId: Int): MoodHistory {
+    override suspend fun getUserMoodHistoryByUserId(userId: Int): List<MoodHistory>  {
         return userMoodHistoryDao.getUserMoodHistoryByUserId(userId)
     }
 }

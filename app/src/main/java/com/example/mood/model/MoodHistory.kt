@@ -27,6 +27,6 @@ import java.time.LocalDateTime
 data class MoodHistory(
     @PrimaryKey(autoGenerate = true)val id: Int = 0,
     val userId: Int,
-    val userMoodId: Int,
+    var userMoodId: Int,
     val dateLogged: LocalDateTime
 )
